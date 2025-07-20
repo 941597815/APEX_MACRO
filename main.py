@@ -1,7 +1,6 @@
 print("启动中...")
 from globals import globals_instance
 import threading
-import serial
 import time
 from linstion import start_mouse_listener, start_keyboard
 from macro import worker_macro
@@ -25,9 +24,8 @@ if __name__ == "__main__":
     while True:
         globals_instance.status = get_mouse_shape() == 0
         try:
-            if globals_instance.arduino.serial.in_waiting >= 0:  # 或 ser.read(1)
-                pass  # 正常
-        except (serial.SerialException, OSError):
+            globals_instance.arduino.dev.read(1, timeout_ms=3)
+        except OSError:
             print("设备已断开！程序结束")
             # time.sleep(1)
             break

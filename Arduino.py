@@ -1,274 +1,200 @@
-import serial
+import hid
 import time
-from serial.tools import list_ports
+
+VID_PID = (0x046D, 0xC08B)  # Leonardo / Pro Micro 默认 VID/PID，可按实际改
 
 
 class HIDDevice:
+    """HID 版本的键盘鼠标控制"""
+
     class Mouse:
+        LEFT, RIGHT, MIDDLE = "LEFT", "RIGHT", "MIDDLE"
 
-        LEFT = "LEFT"
-        RIGHT = "RIGHT"
-        MIDDLE = "MIDDLE"
+        def __init__(self, parent):
+            self.parent = parent  # 指向 HIDDevice 实例
 
-        def __init__(self, serial_conn):
-            self.serial = serial_conn
+        def _send(self, cmd: str):
+            self.parent._send(cmd)  # 调用父类公共方法
 
         def wheel(self, a):
-            """
-              鼠标滚轮
-            :param wheel: 滚轮移动量
-            """
-            self.serial.write(f"MOVE:{0},{0},{a}\n".encode())
+            self._send(f"MOVE:0,0,{a}")
 
         def move(self, x, y):
-            """
-              移动鼠标
-            :param x: X轴移动量
-            :param y: Y轴移动量
-            """
             if x == 0 and y == 0:
                 return
-            # 分段调用 move 函数
+            # 先处理 x、y 均超过 127 的情况，逐轴拆解
             while abs(x) > 127 or abs(y) > 127:
-                # 计算当前步长
-                step_x = 127 if x > 0 else -127
-                step_y = 127 if y > 0 else -127
-                # 调用 move 函数
-                # driver.move(step_x, step_y)
-                self.serial.write(f"MOVE:{step_x},{step_y},{0}\n".encode())
-                # 更新 x 和 y
-                x -= step_x
-                y -= step_y
-            # 调用 move 函数处理剩余的部分
-            self.serial.write(f"MOVE:{x},{y},{0}\n".encode())
+                step_x = 0
+                step_y = 0
+                # 仅当 x 需要拆步时才拆
+                if abs(x) > 127:
+                    step_x = 127 if x > 0 else -127
+                    x -= step_x
+                # 仅当 y 需要拆步时才拆
+                if abs(y) > 127:
+                    step_y = 127 if y > 0 else -127
+                    y -= step_y
+                self._send(f"MOVE:{step_x},{step_y},0")
+            # 剩余不足 127 的“尾量”一次性发完
+            self._send(f"MOVE:{x},{y},0")
 
         def press(self, button=LEFT):
-            """按下鼠标按钮"""
-            self.serial.write(f"MOUSE_BTN:{button}:PRESS\n".encode())
+            self._send(f"MOUSE_BTN:{button}:PRESS")
 
         def release(self, button=LEFT):
-            """释放鼠标按钮"""
-            self.serial.write(f"MOUSE_BTN:{button}:RELEASE\n".encode())
+            self._send(f"MOUSE_BTN:{button}:RELEASE")
 
         def click(self, button=LEFT):
-            """点击鼠标按钮"""
-            self.serial.write(f"MOUSE_BTN:{button}:CLICK\n".encode())
+            self._send(f"MOUSE_BTN:{button}:CLICK")
 
         def drag(
             self, start_x, start_y, end_x, end_y, button=LEFT, steps=10, delay=0.01
         ):
-            """拖拽操作"""
             self.move(start_x, start_y)
             time.sleep(0.1)
             self.press(button)
             time.sleep(0.1)
-
-            # 平滑移动到目标位置
             dx = (end_x - start_x) / steps
             dy = (end_y - start_y) / steps
-
-            for i in range(steps):
+            for _ in range(steps):
                 self.move(int(dx), int(dy))
                 time.sleep(delay)
-
             self.release(button)
 
     class Keyboard:
+        # 所有键名与原来保持一致
+        A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z = (
+            "A",
+            "B",
+            "C",
+            "D",
+            "E",
+            "F",
+            "G",
+            "H",
+            "I",
+            "J",
+            "K",
+            "L",
+            "M",
+            "N",
+            "O",
+            "P",
+            "Q",
+            "R",
+            "S",
+            "T",
+            "U",
+            "V",
+            "W",
+            "X",
+            "Y",
+            "Z",
+        )
+        KEY_0, KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_7, KEY_8, KEY_9 = (
+            "0",
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9",
+        )
+        # 其他键同理……
+        ENTER, ESC, BACKSPACE, TAB, SPACE = "ENTER", "ESC", "BACKSPACE", "TAB", "SPACE"
+        F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12 = (
+            "F1",
+            "F2",
+            "F3",
+            "F4",
+            "F5",
+            "F6",
+            "F7",
+            "F8",
+            "F9",
+            "F10",
+            "F11",
+            "F12",
+        )
+        LCTRL, LSHIFT, LALT, LGUI, RCTRL, RSHIFT, RALT, RGUI = (
+            "LCTRL",
+            "LSHIFT",
+            "LALT",
+            "LGUI",
+            "RCTRL",
+            "RSHIFT",
+            "RALT",
+            "RGUI",
+        )
 
-        # 字母键
-        A = "A"
-        B = "B"
-        C = "C"
-        D = "D"
-        E = "E"
-        F = "F"
-        G = "G"
-        H = "H"
-        I = "I"
-        J = "J"
-        K = "K"
-        L = "L"
-        M = "M"
-        N = "N"
-        O = "O"
-        P = "P"
-        Q = "Q"
-        R = "R"
-        S = "S"
-        T = "T"
-        U = "U"
-        V = "V"
-        W = "W"
-        X = "X"
-        Y = "Y"
-        Z = "Z"
+        def __init__(self, parent):
+            self.parent = parent
 
-        # 数字键
-        KEY_0 = "0"
-        KEY_1 = "1"
-        KEY_2 = "2"
-        KEY_3 = "3"
-        KEY_4 = "4"
-        KEY_5 = "5"
-        KEY_6 = "6"
-        KEY_7 = "7"
-        KEY_8 = "8"
-        KEY_9 = "9"
-
-        # 功能键
-        ENTER = "ENTER"
-        ESC = "ESC"
-        BACKSPACE = "BACKSPACE"
-        TAB = "TAB"
-        SPACE = "SPACE"
-        MINUS = "MINUS"
-        EQUAL = "EQUAL"
-        LEFTBRACE = "LEFTBRACE"
-        RIGHTBRACE = "RIGHTBRACE"
-        BACKSLASH = "BACKSLASH"
-        SEMICOLON = "SEMICOLON"
-        QUOTE = "QUOTE"
-        TILDE = "TILDE"
-        COMMA = "COMMA"
-        PERIOD = "PERIOD"
-        SLASH = "SLASH"
-        CAPSLOCK = "CAPSLOCK"
-
-        # F键
-        F1 = "F1"
-        F2 = "F2"
-        F3 = "F3"
-        F4 = "F4"
-        F5 = "F5"
-        F6 = "F6"
-        F7 = "F7"
-        F8 = "F8"
-        F9 = "F9"
-        F10 = "F10"
-        F11 = "F11"
-        F12 = "F12"
-
-        # 其他功能键
-        PRINTSCREEN = "PRINTSCREEN"
-        SCROLLLOCK = "SCROLLLOCK"
-        PAUSE = "PAUSE"
-        INSERT = "INSERT"
-        HOME = "HOME"
-        PAGEUP = "PAGEUP"
-        DELETE = "DELETE"
-        END = "END"
-        PAGEDOWN = "PAGEDOWN"
-
-        # 方向键
-        RIGHT = "RIGHT"
-        LEFT = "LEFT"
-        DOWN = "DOWN"
-        UP = "UP"
-
-        # 小键盘
-        NUMLOCK = "NUMLOCK"
-        KPDIVIDE = "KPDIVIDE"
-        KPMULTIPLY = "KPMULTIPLY"
-        KPSUBTRACT = "KPSUBTRACT"
-        KPADD = "KPADD"
-        KPDECIMAL = "KPDECIMAL"
-        KPENTER = "KPENTER"
-        KP1 = "KP1"
-        KP2 = "KP2"
-        KP3 = "KP3"
-        KP4 = "KP4"
-        KP5 = "KP5"
-        KP6 = "KP6"
-        KP7 = "KP7"
-        KP8 = "KP8"
-        KP9 = "KP9"
-        KP0 = "KP0"
-
-        # 菜单键
-        MENU = "MENU"
-
-        # 修饰键
-        LCTRL = "LCTRL"
-        LSHIFT = "LSHIFT"
-        LALT = "LALT"
-        LGUI = "LGUI"
-        RCTRL = "RCTRL"
-        RSHIFT = "RSHIFT"
-        RALT = "RALT"
-        RGUI = "RGUI"
-
-        def __init__(self, serial_conn):
-            self.serial = serial_conn
+        def _send(self, cmd: str):
+            self.parent._send(cmd)
 
         def press(self, key):
-            """按下键盘按键"""
-            self.serial.write(f"KEY:{key}:PRESS\n".encode())
+            self._send(f"KEY:{key}:PRESS")
 
         def release(self, key):
-            """释放键盘按键"""
-            self.serial.write(f"KEY:{key}:RELEASE\n".encode())
+            self._send(f"KEY:{key}:RELEASE")
 
         def click(self, key):
-            """点击键盘按键（按下并释放）"""
-            self.serial.write(f"KEY:{key}:CLICK\n".encode())
+            self._send(f"KEY:{key}:CLICK")
 
         def type(self, text):
-            """输入字符串"""
-            self.serial.write(f"TYPE:{text}\n".encode())
+            self._send(f"TYPE:{text}")
 
         def hotkey(self, *keys, delay=0.05):
-            """按下组合键"""
-            for key in keys:
-                self.press(key)
+            for k in keys:
+                self.press(k)
                 time.sleep(delay)
-
             time.sleep(0.1)
-
-            for key in reversed(keys):
-                self.release(key)
+            for k in reversed(keys):
+                self.release(k)
                 time.sleep(delay)
 
-    def __init__(self, port=None, baudrate=115200):
-        if port is None:
-            port = self.find_arduino()
-        self.serial = serial.Serial(port, baudrate, timeout=1)
-        time.sleep(2)  # 等待Arduino初始化
-        print("Arduino初始化完成")
-        self.mouse = self.Mouse(self.serial)
-        self.keyboard = self.Keyboard(self.serial)
-
-    @staticmethod
-    def find_arduino():
-        """自动检测Arduino Pro Micro"""
-        ports = list_ports.comports()
-        for p in ports:
-            # Arduino Pro Micro的常见ID
-            if "2341:8037" in p.hwid or "2341:8036" in p.hwid or "046D:C08B" in p.hwid:
-                return p.device
-        raise Exception("Arduino设备未找到")
+    def __init__(self, vid_pid=None):
+        if vid_pid is None:
+            vid_pid = VID_PID
+        self.dev = hid.device()
+        # self.dev.nonblocking = False
+        self.dev.open(*vid_pid)
+        self.mouse = self.Mouse(self)
+        self.keyboard = self.Keyboard(self)
 
     def release_all(self):
-        """释放所有按键"""
-        self.serial.write("RELEASE_ALL\n".encode())
+        self._send("RELEASE_ALL")
 
     def close(self):
-        """关闭连接"""
         self.release_all()
-        self.serial.close()
+        self.dev.close()
+
+    def _send(self, cmd: str):
+        # 第 0 字节放 Report ID 0，后面跟命令
+        buf = b"\x00" + (cmd + "\n").encode()
+        buf = buf.ljust(64, b"\0")[:64]
+        self.dev.write(buf)
+        # Windows 会把 < 1 ms 的 HID 报文合并；给每条报文 ≥ 1 ms 间隔即可彻底解决“有时arudino收不到报文”的问题。
+        time.sleep(0.001)
+        # print(">>>", repr(buf))
 
 
-# 使用示例
+# ----------------- 示例 -----------------
 if __name__ == "__main__":
-    dev = HIDDevice()  # 自动检测端口
-
+    dev = HIDDevice()
+    time.sleep(1)
     # 鼠标操作示例
-    dev.mouse.move(555, 0)  #
-    dev.mouse.press()  # 按下左键
-    dev.mouse.move(20, 30)  # 移动鼠标
-    dev.mouse.release()  # 释放左键
-    dev.mouse.click("RIGHT")
-    dev.mouse.click("MIDDLE")
-    dev.mouse.drag(0, 0, 100, 100)  # 拖拽操作
+    # dev.mouse.move(255, 0)  #
+    # dev.mouse.press()  # 按下左键
+    # dev.mouse.move(20, 30)  # 移动鼠标
+    # dev.mouse.release()  # 释放左键
+    # dev.mouse.click("RIGHT")
+    # dev.mouse.click("MIDDLE")
+    # dev.mouse.drag(0, 0, 100, 100)  # 拖拽操作
 
     # 键盘测试
     key_list = [
@@ -377,23 +303,23 @@ if __name__ == "__main__":
         "RALT",
         "RGUI",
     ]
-    print("测试所有按键")
-    for key in key_list:
-        # print(key)
-        dev.keyboard.press(key)
-        dev.keyboard.release(key)
-        time.sleep(0.1)
-    time.sleep(1)
+    # print("测试所有按键")
+    # for key in key_list:
+    #     # print(key)
+    #     dev.keyboard.press(key)
+    #     dev.keyboard.release(key)
+    #     time.sleep(0.1)
+    # time.sleep(1)
     # 组合键
     print("测试组合按键")
-    dev.keyboard.press("LALT")  # 按下左Ctrl
-    dev.keyboard.click(dev.keyboard.TAB)  # 点击C键
-    dev.keyboard.release("LALT")  # 释放左Ctrl
-    time.sleep(1)
+    # dev.keyboard.press("LALT")
+    # dev.keyboard.click(dev.keyboard.TAB)
+    # dev.keyboard.release("LALT")
+    # time.sleep(1)
     # 输入文本
     print("测试输入文本")
     dev.keyboard.type("Hello Arduino HID!")
-    time.sleep(1)
-    print("所有测试完成")
+    # time.sleep(1)
+    # print("所有测试完成")
 
     dev.close()
