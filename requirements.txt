@@ -1,0 +1,3 @@
+numpy==2.2.3
+pynput==1.8.0
+pywin32==309
