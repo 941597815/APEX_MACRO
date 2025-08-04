@@ -1,7 +1,8 @@
 import hid
 import time
 
-VID_PID = (0x046D, 0xC08B)  # Leonardo / Pro Micro 默认 VID/PID，可按实际改
+VID_PID = (0x046D, 0xC08B)  # 罗技G102
+# VID_PID = (0x046D, 0xC08F)  # 罗技G403 Logitech G403 Wired Gaming Mouse
 
 
 class HIDDevice:
@@ -161,7 +162,6 @@ class HIDDevice:
         if vid_pid is None:
             vid_pid = VID_PID
         self.dev = hid.device()
-        # self.dev.nonblocking = False
         self.dev.open(*vid_pid)
         self.mouse = self.Mouse(self)
         self.keyboard = self.Keyboard(self)
@@ -179,7 +179,10 @@ class HIDDevice:
         buf = buf.ljust(64, b"\0")[:64]
         self.dev.write(buf)
         # Windows 会把 < 1 ms 的 HID 报文合并；给每条报文 ≥ 1 ms 间隔即可彻底解决“有时arudino收不到报文”的问题。
-        time.sleep(0.001)
+        # time.sleep(0.001)
+        old = time.time()
+        while time.time() - old < 0.002:
+            pass
         # print(">>>", repr(buf))
 
 

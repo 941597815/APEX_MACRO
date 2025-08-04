@@ -6,6 +6,23 @@ import random
 import ctypes
 
 
+def printLogo():
+    logo = r"""     
+
+
+ █████╗ ██████╗ ███████╗██╗  ██╗
+██╔══██╗██╔══██╗██╔════╝╚██╗██╔╝
+███████║██████╔╝█████╗   ╚███╔╝ 
+██╔══██║██╔═══╝ ██╔══╝   ██╔██╗ 
+██║  ██║██║     ███████╗██╔╝ ██╗
+╚═╝  ╚═╝╚═╝     ╚══════╝╚═╝  ╚═╝
+                                                 
+        Arduino Pro Micro
+
+    """
+    print(logo)
+
+
 def get_mouse_shape():
     # 获取鼠标光标形状
     cursor = win32gui.GetCursorInfo()
@@ -102,8 +119,15 @@ def disable_keys(keys):
             ctypes.windll.user32.keybd_event(vk, 0, 2, 0)  # KEYUP
 
 
+def Delay(ms):
+    old = time.time()
+    while time.time() - old < (ms / 1000):
+        pass
+
+
 if __name__ == "__main__":
     # random_delay_ms(100, 800)
     # disable_keys([0x14, 0x91])
-    time.sleep(3)
-    print(get_mouse_shape())
+    # time.sleep(3)
+    # print(get_mouse_shape())
+    printLogo()

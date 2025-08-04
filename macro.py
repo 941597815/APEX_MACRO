@@ -2,7 +2,7 @@ import time
 import random
 from globals import globals_instance
 from Arduino import HIDDevice
-from utils import random_delay_ms, truncated_normal_random
+from utils import random_delay_ms, truncated_normal_random, Delay
 
 arduino = HIDDevice()
 globals_instance.arduino = arduino
@@ -16,36 +16,32 @@ def huanjia():
     else:
         n = 1
     arduino.mouse.move(int(-580 * n), int(14 * n))
-    random_delay_ms(5, 15)
+    random_delay_ms(3, 6)
     arduino.mouse.click()
-    random_delay_ms(5, 15)
+    random_delay_ms(3, 6)
     arduino.mouse.move(0, int((72 - 14) * n))
-    random_delay_ms(5, 15)
+    random_delay_ms(3, 6)
     arduino.mouse.click()
-    random_delay_ms(5, 15)
-    arduino.mouse.move(0, int((180 - 72 - 14) * n))
-    random_delay_ms(5, 15)
+    random_delay_ms(3, 6)
+    arduino.mouse.move(0, int((180 - 72) * n))
+    random_delay_ms(3, 6)
     arduino.mouse.click()
-    random_delay_ms(5, 15)
+    random_delay_ms(3, 6)
+    arduino.mouse.move(0, int((282 - 180) * n))
+    random_delay_ms(3, 6)
+    arduino.mouse.click()
+    random_delay_ms(3, 6)
     arduino.keyboard.click(arduino.keyboard.TAB)
 
 
 def SG():
-    # print("SG")
-    arduino.keyboard.click(arduino.keyboard.LSHIFT)
     arduino.keyboard.press(arduino.keyboard.SPACE)
-    # time.sleep(0.003)
-    random_delay_ms(1, 5)
     arduino.keyboard.click(arduino.keyboard.C)
-    # random_delay_ms(1, 6)
     arduino.keyboard.release(arduino.keyboard.SPACE)
-    # arduino.keyboard.click(arduino.keyboard.C)
-
-    # random_delay_ms(30, 60)
 
 
 def yaqiang():
-    arduino.mouse.move(0, truncated_normal_random(0, 3))
+    arduino.mouse.move(0, truncated_normal_random(2, 5))
 
 
 def dundun():
@@ -59,9 +55,9 @@ def dundun():
 def Scope():
     if random.randint(0, 1):
         arduino.mouse.press(arduino.mouse.RIGHT)
-        random_delay_ms(80, 300)
+        random_delay_ms(80, 260)
         arduino.mouse.release(arduino.mouse.RIGHT)
-        random_delay_ms(80, 300)
+        random_delay_ms(80, 260)
 
 
 def ReloadSpeedUp():
@@ -94,11 +90,11 @@ def worker_macro():
 
             if globals_instance.zhuanxiang:
                 arduino.keyboard.click(arduino.keyboard.SPACE)
-                random_delay_ms(3, 7)
+                random_delay_ms(0, 5)
                 arduino.keyboard.press(arduino.keyboard.LSHIFT)
                 for i in range(truncated_normal_random(3, 7)):
                     arduino.keyboard.click(arduino.keyboard.W)
-                    random_delay_ms(3, 7)
+                    random_delay_ms(0, 5)
                 arduino.keyboard.release(arduino.keyboard.LSHIFT)
 
             else:

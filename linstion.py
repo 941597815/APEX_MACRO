@@ -69,6 +69,7 @@ def on_scroll(x, y, dx, dy, globals_instance):
         and not globals_instance.zhuanxiang
         and not globals_instance.e
     ):
+
         # print(time.time() - old_time)
         if time.time() - old_time > 0.5:
             old_time = time.time()
@@ -146,7 +147,7 @@ def on_release(key, globals_instance):
     #     ReloadSpeedUp()
     if (
         huanjia_status
-        and is_mouse_at_screen_center()
+        and is_mouse_at_screen_center(10)
         and (
             key == keyboard.KeyCode.from_char("e")
             or key == keyboard.KeyCode.from_char("E")  # or按住shift
