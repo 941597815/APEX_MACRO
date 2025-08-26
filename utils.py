@@ -4,6 +4,8 @@ import time
 import math
 import random
 import ctypes
+import sys
+import traceback
 
 
 def printLogo():
@@ -93,7 +95,7 @@ def truncated_normal_random(m, n):
 def random_delay_ms(min_ms, max_ms):
     """优化的毫秒级延迟函数"""
     delay_ms = truncated_normal_random(min_ms, max_ms)
-    time.sleep(delay_ms / 1000)
+    precise_sleep(delay_ms / 1000)
     return delay_ms
 
 
@@ -119,10 +121,21 @@ def disable_keys(keys):
             ctypes.windll.user32.keybd_event(vk, 0, 2, 0)  # KEYUP
 
 
-def Delay(ms):
-    old = time.time()
-    while time.time() - old < (ms / 1000):
-        pass
+def precise_sleep(duration, precision: float = 0.0001, get_now=time.perf_counter):
+    """
+    自适应补偿的精确 sleep
+
+    :param duration:  需要休眠的总时长（秒）
+    :param precision: 最大允许忙等时长（秒），也是误差上限
+    :param get_now:   时间源，默认 time.perf_counter
+    """
+    end = get_now() + duration
+    while True:
+        remaining = end - get_now()
+        if remaining <= 0:
+            break
+        if remaining > precision:  # 真正可控的 sleep 时长
+            time.sleep(remaining - precision)
 
 
 if __name__ == "__main__":
@@ -131,3 +144,5 @@ if __name__ == "__main__":
     # time.sleep(3)
     # print(get_mouse_shape())
     printLogo()
+    i = 3
+    print(-i, i)

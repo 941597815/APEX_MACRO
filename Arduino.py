@@ -2,7 +2,27 @@ import hid
 import time
 
 VID_PID = (0x046D, 0xC08B)  # 罗技G102
+# VID_PID = (0xCAFE, 0x4004)  # 罗技G102
+
+
 # VID_PID = (0x046D, 0xC08F)  # 罗技G403 Logitech G403 Wired Gaming Mouse
+
+
+def precise_sleep(duration, precision: float = 0.0001, get_now=time.perf_counter):
+    """
+    自适应补偿的精确 sleep, 用于解决time.sleep函数累计误差问题
+
+    :param duration:  需要休眠的总时长（秒）
+    :param precision: 最大允许忙等时长（秒），也是误差上限。 默认1ms
+    :param get_now:   时间源，默认 time.perf_counter
+    """
+    end = get_now() + duration
+    while True:
+        remaining = end - get_now()
+        if remaining <= 0:
+            break
+        if remaining > precision:  # 真正可控的 sleep 时长
+            time.sleep(remaining - precision)
 
 
 class HIDDevice:
@@ -52,14 +72,14 @@ class HIDDevice:
             self, start_x, start_y, end_x, end_y, button=LEFT, steps=10, delay=0.01
         ):
             self.move(start_x, start_y)
-            time.sleep(0.1)
+            precise_sleep(0.1)
             self.press(button)
-            time.sleep(0.1)
+            precise_sleep(0.1)
             dx = (end_x - start_x) / steps
             dy = (end_y - start_y) / steps
             for _ in range(steps):
                 self.move(int(dx), int(dy))
-                time.sleep(delay)
+                precise_sleep(delay)
             self.release(button)
 
     class Keyboard:
@@ -152,15 +172,16 @@ class HIDDevice:
         def hotkey(self, *keys, delay=0.05):
             for k in keys:
                 self.press(k)
-                time.sleep(delay)
-            time.sleep(0.1)
+                precise_sleep(delay)
+            precise_sleep(0.1)
             for k in reversed(keys):
                 self.release(k)
-                time.sleep(delay)
+                precise_sleep(delay)
 
     def __init__(self, vid_pid=None):
         if vid_pid is None:
             vid_pid = VID_PID
+        self.last_time = time.perf_counter()
         self.dev = hid.device()
         self.dev.open(*vid_pid)
         self.mouse = self.Mouse(self)
@@ -177,12 +198,12 @@ class HIDDevice:
         # 第 0 字节放 Report ID 0，后面跟命令
         buf = b"\x00" + (cmd + "\n").encode()
         buf = buf.ljust(64, b"\0")[:64]
-        self.dev.write(buf)
         # Windows 会把 < 1 ms 的 HID 报文合并；给每条报文 ≥ 1 ms 间隔即可彻底解决“有时arudino收不到报文”的问题。
-        # time.sleep(0.001)
-        old = time.time()
-        while time.time() - old < 0.002:
-            pass
+        if time.perf_counter() - self.last_time <= 0.001:
+            precise_sleep(0.001)
+        # 距离上次发送的时间大于1ms才发送本次命令
+        self.dev.write(buf)
+        self.last_time = time.perf_counter()
         # print(">>>", repr(buf))
 
 

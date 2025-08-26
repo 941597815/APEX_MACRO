@@ -1,14 +1,16 @@
 import time
 import random
-from globals import globals_instance
+
+from globals import Globals
+from utils import random_delay_ms, truncated_normal_random, precise_sleep
 from Arduino import HIDDevice
-from utils import random_delay_ms, truncated_normal_random, Delay
 
-arduino = HIDDevice()
-globals_instance.arduino = arduino
+# print(globals_instance.arduino)
+
+arduino: HIDDevice
 
 
-def huanjia():
+def huanjia(globals_instance):
     if globals_instance.resolution == 1:
         n = 1
     elif globals_instance.resolution == 2:
@@ -36,7 +38,9 @@ def huanjia():
 
 def SG():
     arduino.keyboard.press(arduino.keyboard.SPACE)
+    # precise_sleep(0.01)
     arduino.keyboard.click(arduino.keyboard.C)
+    # precise_sleep(0.007)
     arduino.keyboard.release(arduino.keyboard.SPACE)
 
 
@@ -68,14 +72,17 @@ def ReloadSpeedUp():
     arduino.mouse.click()
 
 
-def worker_macro():
+def worker_macro(globals_instance: Globals):
+    global arduino
+    arduino = globals_instance.arduino
+
     while True:
         if globals_instance.status:
             if globals_instance.running:
                 num = truncated_normal_random(3, 5)
-                arduino.mouse.move(num, num)
+                arduino.mouse.move(-num, num)
                 random_delay_ms(1, 4)
-                arduino.mouse.move(-1 * num, -1 * num)
+                arduino.mouse.move(num, -num)
                 random_delay_ms(1, 4)
                 yaqiang()
                 random_delay_ms(1, 4)
@@ -98,6 +105,6 @@ def worker_macro():
                 arduino.keyboard.release(arduino.keyboard.LSHIFT)
 
             else:
-                time.sleep(0.001)
+                precise_sleep(0.001)
         else:
-            time.sleep(0.001)
+            precise_sleep(0.001)

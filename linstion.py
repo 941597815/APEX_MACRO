@@ -1,10 +1,9 @@
 import os
 import winsound
-import threading
 import time
 from pynput import mouse, keyboard
 from macro import huanjia, SG, ReloadSpeedUp
-from utils import is_mouse_at_screen_center
+from utils import is_mouse_at_screen_center, precise_sleep
 
 alt_pressed = False
 ctrl_pressed = False
@@ -20,6 +19,7 @@ keyboard_ws = False
 # douqiang = False
 huanjia_status = False
 e_status = False
+w_status = False
 
 
 # 鼠标点击回调函数
@@ -61,6 +61,7 @@ def on_click(x, y, button, pressed, globals_instance):
 
 def on_scroll(x, y, dx, dy, globals_instance):
     global old_time
+
     # print(dy)
     # 不能与其他宏一起调用，否则卡死
     if (
@@ -90,7 +91,8 @@ def start_mouse_listener(globals_instance):
 
 
 def on_press(key, globals_instance):
-    global alt_pressed, ctrl_pressed, shift_pressed, caps_lock, timer, network_restrictions, old_time, keyboard_ws, huanjia_status, timer_E
+    global alt_pressed, ctrl_pressed, shift_pressed, caps_lock, timer, network_restrictions, old_time, keyboard_ws, huanjia_status, timer_E, w_status
+
     # 检查按下的键是否是 Home 键
     if key == keyboard.Key.home:
         globals_instance.arduino.close()
@@ -128,12 +130,19 @@ def on_press(key, globals_instance):
     #     if not globals_instance.status:
     #         pass
     #         # huanjia()
+    if (
+        key == keyboard.KeyCode.from_char("w")
+        or key == keyboard.KeyCode.from_char("W")
+        or key == keyboard.KeyCode.from_char("\x17")
+    ):
+        w_status = True
 
 
 def on_release(key, globals_instance):
-    global alt_pressed, ctrl_pressed, shift_pressed, caps_lock, huanjia_status
+    global alt_pressed, ctrl_pressed, shift_pressed, caps_lock, huanjia_status, w_status
+
     # print(str(key) == str(keyboard.KeyCode(vk=49)))
-    # print(str(key), keyboard.KeyCode(vk=49))
+    # print(str(key))
     if key == keyboard.Key.alt_l:
         alt_pressed = False
         # print('altUp')
@@ -146,15 +155,21 @@ def on_release(key, globals_instance):
     # if key == keyboard.KeyCode.from_char("r") or key == keyboard.KeyCode.from_char("R"):
     #     ReloadSpeedUp()
     if (
+        key == keyboard.KeyCode.from_char("w")
+        or key == keyboard.KeyCode.from_char("W")
+        or key == keyboard.KeyCode.from_char("\x17")
+    ):
+        w_status = False
+    if (
         huanjia_status
         and is_mouse_at_screen_center(10)
         and (
             key == keyboard.KeyCode.from_char("e")
-            or key == keyboard.KeyCode.from_char("E")  # or按住shift
-            or key == keyboard.KeyCode.from_char("\x05")
+            or key == keyboard.KeyCode.from_char("E")  # 按住lshift
+            or key == keyboard.KeyCode.from_char("\x05")  # 按住lctrl
         )
     ):
-        time.sleep(0.01)
+        precise_sleep(0.01)
         if not globals_instance.status:
             huanjia()
 
