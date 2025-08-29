@@ -1,0 +1,5 @@
+# 画面分辨率 1=1920x1080 / 2=2560x1440
+resolution: 1
+
+# 驱动来源 "RP2040" / "ARDUINO"
+deviceType: "RP2040"

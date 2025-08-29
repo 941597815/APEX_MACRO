@@ -4,12 +4,30 @@ import time
 import math
 import random
 import ctypes
-import sys
-import traceback
+import tkinter as tk
+from tkinter import messagebox
+import hid
 
 
-def printLogo():
-    logo = r"""     
+def printLogo(device):
+
+    if device == "RP2040":
+        logo = r"""     
+
+
+ █████╗ ██████╗ ███████╗██╗  ██╗
+██╔══██╗██╔══██╗██╔════╝╚██╗██╔╝
+███████║██████╔╝█████╗   ╚███╔╝ 
+██╔══██║██╔═══╝ ██╔══╝   ██╔██╗ 
+██║  ██║██║     ███████╗██╔╝ ██╗
+╚═╝  ╚═╝╚═╝     ╚══════╝╚═╝  ╚═╝
+                                                 
+              RP2040
+
+    """
+
+    elif device == "ARDUINO":
+        logo = r"""     
 
 
  █████╗ ██████╗ ███████╗██╗  ██╗
@@ -138,11 +156,29 @@ def precise_sleep(duration, precision: float = 0.0001, get_now=time.perf_counter
             time.sleep(remaining - precision)
 
 
+def showMessage(msg: str, title="提示"):
+    # 隐藏主窗口
+    root = tk.Tk()
+    root.withdraw()
+
+    # 弹出提示框
+    messagebox.showinfo(title, msg)
+
+
+def hid_connected(vid: int, pid: int) -> bool:
+    return any(
+        d["vendor_id"] == vid and d["product_id"] == pid for d in hid.enumerate()
+    )
+
+
 if __name__ == "__main__":
     # random_delay_ms(100, 800)
     # disable_keys([0x14, 0x91])
     # time.sleep(3)
     # print(get_mouse_shape())
-    printLogo()
-    i = 3
-    print(-i, i)
+    # showMessage("123123123123123123")
+
+    if hid_connected(0x046D, 0xC08F):
+        print("已连接")
+    else:
+        print("未连接")

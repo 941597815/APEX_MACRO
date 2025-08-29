@@ -3,11 +3,12 @@ import random
 
 from globals import Globals
 from utils import random_delay_ms, truncated_normal_random, precise_sleep
-from Arduino import HIDDevice
 
-# print(globals_instance.arduino)
+# from device import HIDDevice
 
-arduino: HIDDevice
+# print(globals_instance.device)
+
+device = None
 
 
 def huanjia(globals_instance):
@@ -17,72 +18,72 @@ def huanjia(globals_instance):
         n = 2560 / 1920
     else:
         n = 1
-    arduino.mouse.move(int(-580 * n), int(14 * n))
+    device.mouse.move(int(-580 * n), int(14 * n))
     random_delay_ms(3, 6)
-    arduino.mouse.click()
+    device.mouse.click()
     random_delay_ms(3, 6)
-    arduino.mouse.move(0, int((72 - 14) * n))
+    device.mouse.move(0, int((72 - 14) * n))
     random_delay_ms(3, 6)
-    arduino.mouse.click()
+    device.mouse.click()
     random_delay_ms(3, 6)
-    arduino.mouse.move(0, int((180 - 72) * n))
+    device.mouse.move(0, int((180 - 72) * n))
     random_delay_ms(3, 6)
-    arduino.mouse.click()
+    device.mouse.click()
     random_delay_ms(3, 6)
-    arduino.mouse.move(0, int((282 - 180) * n))
+    device.mouse.move(0, int((282 - 180) * n))
     random_delay_ms(3, 6)
-    arduino.mouse.click()
+    device.mouse.click()
     random_delay_ms(3, 6)
-    arduino.keyboard.click(arduino.keyboard.TAB)
+    device.keyboard.click(device.keyboard.TAB)
 
 
 def SG():
-    arduino.keyboard.press(arduino.keyboard.SPACE)
+    device.keyboard.press(device.keyboard.SPACE)
     # precise_sleep(0.01)
-    arduino.keyboard.click(arduino.keyboard.C)
+    device.keyboard.click(device.keyboard.C)
     # precise_sleep(0.007)
-    arduino.keyboard.release(arduino.keyboard.SPACE)
+    device.keyboard.release(device.keyboard.SPACE)
 
 
 def yaqiang():
-    arduino.mouse.move(0, truncated_normal_random(2, 5))
+    device.mouse.move(0, truncated_normal_random(2, 5))
 
 
 def dundun():
     if random.randint(0, 1):
-        arduino.keyboard.press(arduino.keyboard.LCTRL)
+        device.keyboard.press(device.keyboard.LCTRL)
         random_delay_ms(50, 300)
-        arduino.keyboard.release(arduino.keyboard.LCTRL)
+        device.keyboard.release(device.keyboard.LCTRL)
         random_delay_ms(150, 200)
 
 
 def Scope():
     if random.randint(0, 1):
-        arduino.mouse.press(arduino.mouse.RIGHT)
+        device.mouse.press(device.mouse.RIGHT)
         random_delay_ms(80, 260)
-        arduino.mouse.release(arduino.mouse.RIGHT)
+        device.mouse.release(device.mouse.RIGHT)
         random_delay_ms(80, 260)
 
 
 def ReloadSpeedUp():
-    arduino.keyboard.click(arduino.keyboard.F1)
+    device.keyboard.click(device.keyboard.F1)
     random_delay_ms(880, 900)
-    arduino.mouse.move(-10, 10)
+    device.mouse.move(-10, 10)
     random_delay_ms(80, 100)
-    arduino.mouse.click()
+    device.mouse.click()
 
 
 def worker_macro(globals_instance: Globals):
-    global arduino
-    arduino = globals_instance.arduino
+    global device
+    device = globals_instance.device
 
     while True:
         if globals_instance.status:
             if globals_instance.running:
                 num = truncated_normal_random(3, 5)
-                arduino.mouse.move(-num, num)
+                device.mouse.move(-num, num)
                 random_delay_ms(1, 4)
-                arduino.mouse.move(num, -num)
+                device.mouse.move(num, -num)
                 random_delay_ms(1, 4)
                 yaqiang()
                 random_delay_ms(1, 4)
@@ -92,17 +93,17 @@ def worker_macro(globals_instance: Globals):
                 pass
 
             if globals_instance.e:
-                arduino.keyboard.click(arduino.keyboard.E)
+                device.keyboard.click(device.keyboard.E)
                 random_delay_ms(5, 10)
 
             if globals_instance.zhuanxiang:
-                arduino.keyboard.click(arduino.keyboard.SPACE)
+                device.keyboard.click(device.keyboard.SPACE)
                 random_delay_ms(0, 5)
-                arduino.keyboard.press(arduino.keyboard.LSHIFT)
+                device.keyboard.press(device.keyboard.LSHIFT)
                 for i in range(truncated_normal_random(3, 7)):
-                    arduino.keyboard.click(arduino.keyboard.W)
+                    device.keyboard.click(device.keyboard.W)
                     random_delay_ms(0, 5)
-                arduino.keyboard.release(arduino.keyboard.LSHIFT)
+                device.keyboard.release(device.keyboard.LSHIFT)
 
             else:
                 precise_sleep(0.001)

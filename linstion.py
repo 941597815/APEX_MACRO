@@ -171,7 +171,7 @@ def on_release(key, globals_instance):
     ):
         precise_sleep(0.01)
         if not globals_instance.status:
-            huanjia()
+            huanjia(globals_instance)
 
 
 def start_keyboard(globals_instance):

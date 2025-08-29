@@ -1,11 +1,11 @@
 import hid
 import time
 
-VID_PID = (0x046D, 0xC08B)  # 罗技G102
-# VID_PID = (0xCAFE, 0x4004)  # 罗技G102
+
+# VID_PID = (0x239A, 0xCAFE)  # 罗技G502
 
 
-# VID_PID = (0x046D, 0xC08F)  # 罗技G403 Logitech G403 Wired Gaming Mouse
+VID_PID = (0x046D, 0xC08F)  # 罗技G403 Logitech G403 Wired Gaming Mouse
 
 
 def precise_sleep(duration, precision: float = 0.0001, get_now=time.perf_counter):
@@ -37,8 +37,12 @@ class HIDDevice:
         def _send(self, cmd: str):
             self.parent._send(cmd)  # 调用父类公共方法
 
-        def wheel(self, a):
-            self._send(f"MOVE:0,0,{a}")
+        def wheel(self, scroll: int):
+            """
+            正数向上, 负数向下
+            -127 至 127
+            """
+            self._send(f"MOVE:0,0,{scroll}")
 
         def move(self, x, y):
             if x == 0 and y == 0:
@@ -66,20 +70,19 @@ class HIDDevice:
             self._send(f"MOUSE_BTN:{button}:RELEASE")
 
         def click(self, button=LEFT):
-            self._send(f"MOUSE_BTN:{button}:CLICK")
+            self.press(button)
+            self.release(button)
+            # self._send(f"MOUSE_BTN:{button}:CLICK")
 
-        def drag(
-            self, start_x, start_y, end_x, end_y, button=LEFT, steps=10, delay=0.01
-        ):
-            self.move(start_x, start_y)
-            precise_sleep(0.1)
+        def drag(self, x: int, y: int, button=LEFT, steps=10, delay=0.01):
             self.press(button)
             precise_sleep(0.1)
-            dx = (end_x - start_x) / steps
-            dy = (end_y - start_y) / steps
+            dx = x / steps
+            dy = y / steps
             for _ in range(steps):
                 self.move(int(dx), int(dy))
                 precise_sleep(delay)
+            self.move(int(x % steps), int(y % steps))
             self.release(button)
 
     class Keyboard:
@@ -164,10 +167,33 @@ class HIDDevice:
             self._send(f"KEY:{key}:RELEASE")
 
         def click(self, key):
-            self._send(f"KEY:{key}:CLICK")
+            self.press(key)
+            self.release(key)
+            # self._send(f"KEY:{key}:CLICK")
+
+        def send_combo(self, mods, *keys):
+            """
+            mods: 位掩码
+                0x01 = 左 Ctrl
+                0x02 = 左 Shift
+                0x04 = 左 Alt
+                0x08 = 左 GUI
+                0x10 = 右 Ctrl
+                0x20 = 右 Shift
+                0x40 = 右 Alt
+                0x80 = 右 GUI
+            keys: 最多 6 个键名
+            """
+            buf = bytearray(64)
+            buf[0] = 0x05  # 命令字节：0x05 = COMBO
+            buf[1] = mods  # 修饰键掩码
+            for i, k in enumerate(keys[:6]):
+                buf[2 + i] = ord(k.upper())  # 键码（ASCII->键码，Arduino 再映射）
+            self._send(buf)
 
         def type(self, text):
-            self._send(f"TYPE:{text}")
+            pass
+            # self._send(f"TYPE:{text}")
 
         def hotkey(self, *keys, delay=0.05):
             for k in keys:
@@ -189,15 +215,21 @@ class HIDDevice:
         self.keyboard = self.Keyboard(self)
 
     def release_all(self):
-        self._send("RELEASE_ALL")
+        self._send("RELEASE_ALL_K")
+        self._send("RELEASE_ALL_M")
 
     def close(self):
         self.release_all()
         self.dev.close()
 
     def _send(self, cmd: str):
-        # 第 0 字节放 Report ID 0，后面跟命令
-        buf = b"\x00" + (cmd + "\n").encode()
+        # buf = bytearray(64)
+        # payload = (cmd + "\n").encode()[:63]  # 最多 63 字节
+        # buf[0 : len(payload)] = payload
+        # self.dev.write(b"\x01" + buf)
+        # return
+        # # 第 0 字节放 Report ID 0，后面跟命令
+        buf = b"\x01" + (cmd + "\n").encode()
         buf = buf.ljust(64, b"\0")[:64]
         # Windows 会把 < 1 ms 的 HID 报文合并；给每条报文 ≥ 1 ms 间隔即可彻底解决“有时arudino收不到报文”的问题。
         if time.perf_counter() - self.last_time <= 0.001:
@@ -205,21 +237,30 @@ class HIDDevice:
         # 距离上次发送的时间大于1ms才发送本次命令
         self.dev.write(buf)
         self.last_time = time.perf_counter()
-        # print(">>>", repr(buf))
+        print(">>>", repr(buf))
+        # data = self.dev.read(1)
+        # print("Arduino data:", data)
+        # if data and len(data) == 64:
+        #     flag = bool(data[0])
+        #     print("Arduino says:", flag)
+        # return
 
 
 # ----------------- 示例 -----------------
 if __name__ == "__main__":
     dev = HIDDevice()
-    time.sleep(1)
+    time.sleep(2)
     # 鼠标操作示例
     # dev.mouse.move(255, 0)  #
+    # dev.mouse.wheel(1)  # 滚轮向上
+    # dev.mouse.wheel(-1)  # 滚轮向下
     # dev.mouse.press()  # 按下左键
-    # dev.mouse.move(20, 30)  # 移动鼠标
+    # dev.mouse.move(30, 60)  # 移动鼠标
     # dev.mouse.release()  # 释放左键
+    # dev.mouse.click()
     # dev.mouse.click("RIGHT")
     # dev.mouse.click("MIDDLE")
-    # dev.mouse.drag(0, 0, 100, 100)  # 拖拽操作
+    # dev.mouse.drag(100, 10)  # 拖拽操作
 
     # 键盘测试
     key_list = [
@@ -335,16 +376,18 @@ if __name__ == "__main__":
     #     dev.keyboard.release(key)
     #     time.sleep(0.1)
     # time.sleep(1)
+
     # 组合键
     print("测试组合按键")
     # dev.keyboard.press("LALT")
     # dev.keyboard.click(dev.keyboard.TAB)
-    # dev.keyboard.release("LALT")
+    # dev.keyboard.release("LALT")aa
+    # dev.keyboard.hotkey(dev.keyboard.LALT, dev.keyboard.TAB)
     # time.sleep(1)
     # 输入文本
     print("测试输入文本")
-    dev.keyboard.type("Hello Arduino HID!")
+    # dev.keyboard.type("Hello Arduino HID!")
     # time.sleep(1)
     # print("所有测试完成")
-
+    time.sleep(1)
     dev.close()
