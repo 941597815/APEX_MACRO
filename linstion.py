@@ -95,7 +95,7 @@ def on_press(key, globals_instance):
 
     # 检查按下的键是否是 Home 键
     if key == keyboard.Key.home:
-        globals_instance.arduino.close()
+        globals_instance.device.close()
         winsound.Beep(800, 100)
         winsound.Beep(600, 100)
         winsound.Beep(400, 100)

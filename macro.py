@@ -46,7 +46,7 @@ def SG():
 
 
 def yaqiang():
-    device.mouse.move(0, truncated_normal_random(2, 5))
+    device.mouse.move(0, truncated_normal_random(1, 3))
 
 
 def dundun():
@@ -76,7 +76,7 @@ def ReloadSpeedUp():
 def worker_macro(globals_instance: Globals):
     global device
     device = globals_instance.device
-
+    last_time = time.time()
     while True:
         if globals_instance.status:
             if globals_instance.running:
@@ -85,12 +85,15 @@ def worker_macro(globals_instance: Globals):
                 random_delay_ms(1, 4)
                 device.mouse.move(num, -num)
                 random_delay_ms(1, 4)
-                yaqiang()
-                random_delay_ms(1, 4)
+                if time.time() - last_time < 1:
+                    yaqiang()
+                    random_delay_ms(1, 4)
             elif globals_instance.mouse_L and not globals_instance.mouse_R:
                 # dundun()
                 # Scope()
                 pass
+            else:
+                last_time = time.time()
 
             if globals_instance.e:
                 device.keyboard.click(device.keyboard.E)

@@ -12,26 +12,19 @@ from utils import (
     showMessage,
     hid_connected,
 )
-
-if globals_instance.deviceType == "RP2040":
-    from RP2040 import HIDDevice
-
-elif globals_instance.deviceType == "ARDUINO":
-    from Arduino import HIDDevice
-
-else:
-    HIDDevice = None
+import HIDDevice as Device
 
 if __name__ == "__main__":
 
     # 初始化device
-    if HIDDevice is not None:
-        try:
-            globals_instance.device = HIDDevice()
-        except Exception as e:
-            print("出错了：", e)
-            showMessage(f"{globals_instance.deviceType}_KM 设备未连接")
-            os._exit(0)
+    try:
+        HIDDevice = Device.init(globals_instance.deviceType)
+        if HIDDevice is not None:
+            globals_instance.device = HIDDevice
+    except Exception as e:
+        print("出错了：", e)
+        showMessage(f"{globals_instance.deviceType}_KM 设备未连接")
+        os._exit(0)
 
     # 启动监听器线程
     listener_mouse_thread = threading.Thread(
