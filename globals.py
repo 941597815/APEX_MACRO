@@ -21,23 +21,28 @@
 #         with open(CONFIG_PATH, "w") as f:
 #             json.dump(default_config, f, indent=4)
 #         print(f"已创建默认配置文件: {CONFIG_PATH}")
-import os
+import sys, os
 import yaml
-import pathlib
+from pathlib import Path
 
-CONFIG_PATH = pathlib.Path(__file__).with_name("config.yaml")  # 改成 .yaml 后缀
+# 1. 拿到 exe（或脚本）所在目录
+if getattr(sys, "frozen", False):  # 打包后的 exe
+    BASE_DIR = Path(sys.executable).parent
+else:  # 源码调试
+    BASE_DIR = Path(__file__).resolve().parent
+CONFIG_PATH = BASE_DIR / "config.yaml"
+# CONFIG_PATH = pathlib.Path(__file__).with_name("config.yaml")  # 改成 .yaml 后缀
 
 
 def load_config():
     """加载带注释的 YAML 配置文件并更新全局变量实例"""
     try:
         with open(CONFIG_PATH, "r", encoding="utf-8") as f:
-            config = yaml.safe_load(f) or {}  # 空文件时返回 {}
+            config = yaml.safe_load(f) or {}
         for key, value in config.items():
             if hasattr(globals_instance, key):
                 setattr(globals_instance, key, value)
     except FileNotFoundError:
-        # 创建带注释的默认配置文件
         default_config_yaml = """\
 # 画面分辨率 1=1920x1080 / 2=2560x1440
 resolution: 1
