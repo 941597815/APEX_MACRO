@@ -46,6 +46,7 @@ def printLogo(device):
 def get_mouse_shape():
     # 获取鼠标光标形状
     cursor = win32gui.GetCursorInfo()
+    # print(cursor)
     cursor_shape = cursor[1]
     return cursor_shape
 
@@ -174,8 +175,8 @@ def hid_connected(vid: int, pid: int) -> bool:
 if __name__ == "__main__":
     # random_delay_ms(100, 800)
     # disable_keys([0x14, 0x91])
-    # time.sleep(3)
-    # print(get_mouse_shape())
+    time.sleep(3)
+    print(get_mouse_shape())
     # showMessage("123123123123123123")
 
     if hid_connected(0x046D, 0xC08F):

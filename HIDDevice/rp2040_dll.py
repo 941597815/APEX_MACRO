@@ -69,7 +69,7 @@ class HIDDevice:
         vid, pid = vid_pid or _DEFAULT_VID_PID
         ok = _dll.HID_Open(vid, pid)
         if not ok:
-            raise RuntimeError("无法打开 HID 设备")
+            raise RuntimeError("Unable to open HID device")
         HIDDevice.vid_pid = (vid, pid)
 
     @staticmethod

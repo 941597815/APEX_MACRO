@@ -54,7 +54,7 @@ _dll.Key_Hotkey.argtypes = [ctypes.POINTER(ctypes.c_char_p), ctypes.c_int, ctype
 _dll.Key_Hotkey.restype = ctypes.c_bool
 
 # ------------------ 静态常量 ------------------
-_DEFAULT_VID_PID = (0x046D, 0xC08B)  # 默认示例
+_DEFAULT_VID_PID = (0x046D, 0xC08F)  # 默认示例
 
 
 # ------------------ 顶层类 ------------------
@@ -69,7 +69,7 @@ class HIDDevice:
         vid, pid = vid_pid or _DEFAULT_VID_PID
         ok = _dll.HID_Open(vid, pid)
         if not ok:
-            raise RuntimeError("无法打开 HID 设备")
+            raise RuntimeError("Unable to open HID device")
         HIDDevice.vid_pid = (vid, pid)
 
     @staticmethod

@@ -22,8 +22,8 @@ if __name__ == "__main__":
         if HIDDevice is not None:
             globals_instance.device = HIDDevice
     except Exception as e:
-        print("出错了：", e)
-        showMessage(f"{globals_instance.deviceType}_KM 设备未连接")
+        # print("出错了：", e)
+        showMessage(f"{globals_instance.deviceType}_KM Device not connected")
         os._exit(0)
 
     # 启动监听器线程
@@ -56,7 +56,7 @@ if __name__ == "__main__":
                 globals_instance.device.vid_pid[0],
                 globals_instance.device.vid_pid[1],
             ):
-                print("设备已断开！程序结束")
+                print("The device has been disconnected! The program ends")
                 disable_keys([0x14, 0x91])
                 time.sleep(1)
                 os._exit(0)  # 结束程序
