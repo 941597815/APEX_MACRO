@@ -62,7 +62,7 @@ def on_click(x, y, button, pressed, globals_instance):
 def on_scroll(x, y, dx, dy, globals_instance):
     global old_time
 
-    # print(dy)
+    print(dy)
     # 不能与其他宏一起调用，否则卡死
     if (
         dy > 0

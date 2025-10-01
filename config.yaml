@@ -2,4 +2,4 @@
 resolution: 1
 
 # 驱动来源 "RP2040" / "ARDUINO"
-deviceType: "RP2040"
+deviceType: "RP2040_HOST"

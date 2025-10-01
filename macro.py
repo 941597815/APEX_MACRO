@@ -80,6 +80,7 @@ def worker_macro(globals_instance: Globals):
     while True:
         if globals_instance.status:
             if globals_instance.running:
+                print(111111111111)
                 num = truncated_normal_random(3, 5)
                 device.mouse.move(-num, num)
                 random_delay_ms(1, 4)
