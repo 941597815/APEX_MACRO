@@ -4,9 +4,6 @@ import random
 from globals import Globals
 from utils import random_delay_ms, truncated_normal_random, precise_sleep
 
-# from device import HIDDevice
-
-# print(globals_instance.device)
 
 device = None
 
@@ -80,7 +77,6 @@ def worker_macro(globals_instance: Globals):
     while True:
         if globals_instance.status:
             if globals_instance.running:
-                print(111111111111)
                 num = truncated_normal_random(3, 5)
                 device.mouse.move(-num, num)
                 random_delay_ms(1, 4)

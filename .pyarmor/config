@@ -1,6 +1,0 @@
-[runtime]
-nts = http://ip-api.com/json
-
-[finder]
-data_files = *.yaml *.json
-

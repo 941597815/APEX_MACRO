@@ -62,7 +62,7 @@ def on_click(x, y, button, pressed, globals_instance):
 def on_scroll(x, y, dx, dy, globals_instance):
     global old_time
 
-    print(dy)
+    # print(dy)
     # 不能与其他宏一起调用，否则卡死
     if (
         dy > 0
@@ -70,7 +70,7 @@ def on_scroll(x, y, dx, dy, globals_instance):
         and not globals_instance.zhuanxiang
         and not globals_instance.e
     ):
-
+        # 避免频繁触发
         # print(time.time() - old_time)
         if time.time() - old_time > 0.5:
             old_time = time.time()
