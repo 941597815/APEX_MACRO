@@ -42,6 +42,12 @@ def SG():
     device.keyboard.release(device.keyboard.SPACE)
 
 
+def jump():
+    for i in range(truncated_normal_random(5, 12)):
+        device.keyboard.click(device.keyboard.SPACE)
+        random_delay_ms(0, 5)
+
+
 def yaqiang():
     device.mouse.move(0, truncated_normal_random(1, 3))
 

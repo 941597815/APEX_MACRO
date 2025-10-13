@@ -2,7 +2,7 @@ import os
 import winsound
 import time
 from pynput import mouse, keyboard
-from macro import huanjia, SG, ReloadSpeedUp
+from macro import huanjia, SG, ReloadSpeedUp, jump
 from utils import is_mouse_at_screen_center, precise_sleep
 
 alt_pressed = False
@@ -122,14 +122,16 @@ def on_press(key, globals_instance):
         else:
             winsound.Beep(800, 100)
             winsound.Beep(600, 100)
-    # if huanjia_status and (
-    #     key == keyboard.KeyCode.from_char("e")
-    #     or key == keyboard.KeyCode.from_char("E")  # or按住shift
-    #     or key == keyboard.KeyCode.from_char("\x05")
-    # ):  # 按住ctrl
-    #     if not globals_instance.status:
-    #         pass
-    #         # huanjia()
+    if (
+        shift_pressed
+        and (
+            key == keyboard.KeyCode.from_char("e")
+            or key == keyboard.KeyCode.from_char("E")  # or按住shift
+            or key == keyboard.KeyCode.from_char("\x05")
+        )
+        and globals_instance.status
+    ):  # 按住ctrl
+        jump()
     if (
         key == keyboard.KeyCode.from_char("w")
         or key == keyboard.KeyCode.from_char("W")
