@@ -36,16 +36,16 @@ def huanjia(globals_instance):
 
 def SG():
     device.keyboard.press(device.keyboard.SPACE)
-    # precise_sleep(0.01)
+    precise_sleep(0.003)
     device.keyboard.click(device.keyboard.C)
     # precise_sleep(0.007)
     device.keyboard.release(device.keyboard.SPACE)
 
 
 def jump():
-    for i in range(truncated_normal_random(5, 12)):
+    for i in range(truncated_normal_random(3, 6)):
         device.keyboard.click(device.keyboard.SPACE)
-        random_delay_ms(0, 5)
+        random_delay_ms(3, 6)
 
 
 def yaqiang():
@@ -110,6 +110,9 @@ def worker_macro(globals_instance: Globals):
                     device.keyboard.click(device.keyboard.W)
                     random_delay_ms(0, 5)
                 device.keyboard.release(device.keyboard.LSHIFT)
+
+            if globals_instance.fast_rope:
+                jump()
 
             else:
                 precise_sleep(0.001)

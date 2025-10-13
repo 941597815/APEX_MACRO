@@ -20,11 +20,12 @@ keyboard_ws = False
 huanjia_status = False
 e_status = False
 w_status = False
+mouse_x1 = False
 
 
 # 鼠标点击回调函数
 def on_click(x, y, button, pressed, globals_instance):
-    # global mouse_R, mouse_L, douqiang
+    global mouse_x1
 
     if button == mouse.Button.left:  # 检测鼠标左键
         if pressed:
@@ -49,8 +50,10 @@ def on_click(x, y, button, pressed, globals_instance):
 
     if button == mouse.Button.x1:
         if pressed:
+            mouse_x1 = True
             globals_instance.e = True
         else:
+            mouse_x1 = False
             globals_instance.e = False
     if button == mouse.Button.x2:
         if pressed:
@@ -91,7 +94,7 @@ def start_mouse_listener(globals_instance):
 
 
 def on_press(key, globals_instance):
-    global alt_pressed, ctrl_pressed, shift_pressed, caps_lock, timer, network_restrictions, old_time, keyboard_ws, huanjia_status, timer_E, w_status
+    global alt_pressed, ctrl_pressed, shift_pressed, caps_lock, timer, network_restrictions, old_time, keyboard_ws, huanjia_status, timer_E, w_status, e_status
 
     # 检查按下的键是否是 Home 键
     if key == keyboard.Key.home:
@@ -123,15 +126,21 @@ def on_press(key, globals_instance):
             winsound.Beep(800, 100)
             winsound.Beep(600, 100)
     if (
-        shift_pressed
-        and (
+        (
             key == keyboard.KeyCode.from_char("e")
             or key == keyboard.KeyCode.from_char("E")  # or按住shift
             or key == keyboard.KeyCode.from_char("\x05")
         )
         and globals_instance.status
+        and shift_pressed
+        and not mouse_x1
     ):  # 按住ctrl
-        jump()
+        if not e_status:  # 按住e时只触发一次
+            globals_instance.fast_rope = True
+        e_status = True
+        precise_sleep(0.011)
+        globals_instance.fast_rope = False
+
     if (
         key == keyboard.KeyCode.from_char("w")
         or key == keyboard.KeyCode.from_char("W")
@@ -141,7 +150,7 @@ def on_press(key, globals_instance):
 
 
 def on_release(key, globals_instance):
-    global alt_pressed, ctrl_pressed, shift_pressed, caps_lock, huanjia_status, w_status
+    global alt_pressed, ctrl_pressed, shift_pressed, caps_lock, huanjia_status, w_status, e_status
 
     # print(str(key) == str(keyboard.KeyCode(vk=49)))
     # print(str(key))
@@ -162,17 +171,21 @@ def on_release(key, globals_instance):
         or key == keyboard.KeyCode.from_char("\x17")
     ):
         w_status = False
+
     if (
-        huanjia_status
-        and is_mouse_at_screen_center(10)
-        and (
-            key == keyboard.KeyCode.from_char("e")
-            or key == keyboard.KeyCode.from_char("E")  # 按住lshift
-            or key == keyboard.KeyCode.from_char("\x05")  # 按住lctrl
-        )
+        key == keyboard.KeyCode.from_char("e")
+        or key == keyboard.KeyCode.from_char("E")  # 按住lshift
+        or key == keyboard.KeyCode.from_char("\x05")  # 按住lctrl
     ):
-        precise_sleep(0.01)
-        if not globals_instance.status:
+        e_status = False
+        globals_instance.fast_rope = False
+
+        if (
+            huanjia_status
+            and is_mouse_at_screen_center(10)
+            and not globals_instance.status
+        ):
+            precise_sleep(0.01)
             huanjia(globals_instance)
 
 

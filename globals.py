@@ -81,6 +81,7 @@ class Globals:
         self.zhuanxiang = False
         self.douqiang = False
         self.e = False
+        self.fast_rope = False
         self.mouse_L = False
         self.mouse_R = False
         self.device = None
