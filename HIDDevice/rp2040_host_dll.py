@@ -89,7 +89,7 @@ _dll.HID_ParseMouseReport.argtypes = [
 _dll.HID_ParseMouseReport.restype = ctypes.c_bool
 
 # ------------------ 静态常量 ------------------
-_DEFAULT_VID_PID = (0x1234, 0x4321)  # 替换为您的设备VID/PID
+_DEFAULT_VID_PID = (0x046D, 0xC08B)  # 替换为您的设备VID/PID
 
 
 # ------------------ 顶层类 ------------------
@@ -168,7 +168,7 @@ class HIDDevice:
             return _dll.Mouse_Release(button)
 
         @staticmethod
-        def click(button: int = LEFT, duration_ms: int = 50) -> bool:
+        def click(button: int = LEFT) -> bool:
             """
             点击鼠标按钮
             :param button: 按钮常量
@@ -177,7 +177,6 @@ class HIDDevice:
             """
             if not _dll.Mouse_Press(button):
                 return False
-            time.sleep(duration_ms / 1000)
             return _dll.Mouse_Release(button)
 
         @staticmethod
@@ -335,7 +334,7 @@ class HIDDevice:
             return _dll.Key_Release(key)
 
         @staticmethod
-        def click(key: int, duration_ms: int = 50) -> bool:
+        def click(key: int) -> bool:
             """
             点击键盘按键
             :param key: 键值常量
@@ -344,7 +343,6 @@ class HIDDevice:
             """
             if not _dll.Key_Press(key):
                 return False
-            time.sleep(duration_ms / 1000)
             return _dll.Key_Release(key)
 
         # @staticmethod
@@ -620,11 +618,11 @@ if __name__ == "__main__":
     try:
         # 初始化设备
         HIDDevice.open()
-        time.sleep(3)
-
-        # 测试鼠标
-        print("测试鼠标移动")
-        HIDDevice.mouse.move(100, 50)
+        # time.sleep(3)
+        old = time.time()
+        for i in range(100):
+            HIDDevice.mouse.move(1, 1)
+        print((time.time() - old) / 100)
         time.sleep(1)
 
         # print("测试鼠标点击")

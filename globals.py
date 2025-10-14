@@ -1,26 +1,3 @@
-# import json
-
-# # 配置文件路径
-# CONFIG_PATH = "config.json"
-
-
-# def load_config():
-#     """加载JSON配置文件并更新全局变量实例"""
-#     try:
-#         with open(CONFIG_PATH, "r") as f:
-#             config = json.load(f)
-#             # 更新实例属性
-#             for key, value in config.items():
-#                 if hasattr(globals_instance, key):
-#                     setattr(globals_instance, key, value)
-#     except FileNotFoundError:
-#         # 创建默认配置文件
-#         default_config = {
-#             "resolution": 1,
-#         }
-#         with open(CONFIG_PATH, "w") as f:
-#             json.dump(default_config, f, indent=4)
-#         print(f"已创建默认配置文件: {CONFIG_PATH}")
 import sys, os
 import yaml
 from pathlib import Path
@@ -47,8 +24,8 @@ def load_config():
 # 画面分辨率 1=1920x1080 / 2=2560x1440,桌面分辨率与游戏分辨率需要一致,缩放100%
 resolution: 1
 
-# 驱动来源 驱动来源 "RP2040" / "RP2040_HOST" / "ARDUINO"
-deviceType: "ARDUINO"
+# 驱动来源 "RP2040_HOST"
+deviceType: "RP2040_HOST"
 """
         CONFIG_PATH.write_text(default_config_yaml, encoding="utf-8")
         print(f"已创建默认配置文件: {CONFIG_PATH}")
@@ -85,7 +62,7 @@ class Globals:
         self.mouse_L = False
         self.mouse_R = False
         self.device = None
-        self.deviceType = "ARDUINO"  # "RP2040"/"ARDUINO"
+        self.deviceType = "RP2040_HOST"
 
 
 # 创建全局变量实例
