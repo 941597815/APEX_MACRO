@@ -1,4 +1,5 @@
 numpy==2.2.3
 pynput==1.8.0
 pywin32==309
+pyinstaller==6.15.0
 hidapi

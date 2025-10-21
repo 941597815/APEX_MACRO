@@ -26,6 +26,19 @@ resolution: 1
 
 # 驱动来源 "RP2040_HOST"
 deviceType: "RP2040_HOST"
+
+# 启用或禁用某些功能 YES=启用, NO=禁用
+AerialSteering: "YES" #空中转向
+
+Jitter: "YES" #抖动以抵消后坐力
+
+ArmorChange: "YES" #一键更换护甲
+
+QuickPickup: "YES" #快速拾取
+
+SuperGlide: "YES" #滚轮向上 SG
+
+QuickRope: "YES" #快速上绳索
 """
         CONFIG_PATH.write_text(default_config_yaml, encoding="utf-8")
         print(f"已创建默认配置文件: {CONFIG_PATH}")
@@ -63,6 +76,12 @@ class Globals:
         self.mouse_R = False
         self.device = None
         self.deviceType = "RP2040_HOST"
+        self.AerialSteering = "YES"
+        self.Jitter = "YES"
+        self.QuickPickup = "YES"
+        self.SuperGlide = "YES"
+        self.QuickRope = "YES"
+        self.ArmorChange = "YES"
 
 
 # 创建全局变量实例

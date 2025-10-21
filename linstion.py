@@ -26,36 +26,36 @@ mouse_x1 = False
 # 鼠标点击回调函数
 def on_click(x, y, button, pressed, globals_instance):
     global mouse_x1
+    if globals_instance.Jitter == "YES":
+        if button == mouse.Button.left:  # 检测鼠标左键
+            if pressed:
+                globals_instance.mouse_L = True
+                if globals_instance.mouse_R and globals_instance.douqiang:
+                    globals_instance.running = True
+                # print("开始")
+            else:
+                globals_instance.running = False
+                globals_instance.mouse_L = False
 
-    if button == mouse.Button.left:  # 检测鼠标左键
-        if pressed:
-            globals_instance.mouse_L = True
-            if globals_instance.mouse_R and globals_instance.douqiang:
-                globals_instance.running = True
-            # print("开始")
-        else:
-            globals_instance.running = False
-            globals_instance.mouse_L = False
+                # print("结束")
+        if button == mouse.Button.right:
+            if pressed:
+                globals_instance.mouse_R = True
+                if globals_instance.mouse_L and globals_instance.douqiang:
+                    globals_instance.running = True
 
-            # print("结束")
-    if button == mouse.Button.right:
-        if pressed:
-            globals_instance.mouse_R = True
-            if globals_instance.mouse_L and globals_instance.douqiang:
-                globals_instance.running = True
+            else:
+                globals_instance.mouse_R = False
+                globals_instance.running = False
 
-        else:
-            globals_instance.mouse_R = False
-            globals_instance.running = False
-
-    if button == mouse.Button.x1:
+    if globals_instance.QuickPickup == "YES" and button == mouse.Button.x1:
         if pressed:
             mouse_x1 = True
             globals_instance.e = True
         else:
             mouse_x1 = False
             globals_instance.e = False
-    if button == mouse.Button.x2:
+    if globals_instance.AerialSteering == "YES" and button == mouse.Button.x2:
         if pressed:
             globals_instance.zhuanxiang = True
         else:
@@ -68,7 +68,8 @@ def on_scroll(x, y, dx, dy, globals_instance):
     # print(dy)
     # 不能与其他宏一起调用，否则卡死
     if (
-        dy > 0
+        globals_instance.SuperGlide == "YES"
+        and dy > 0
         and globals_instance.status
         and not globals_instance.zhuanxiang
         and not globals_instance.e
@@ -109,7 +110,7 @@ def on_press(key, globals_instance):
         ctrl_pressed = True
     if key == keyboard.Key.shift_l:
         shift_pressed = True
-    if key == keyboard.Key.caps_lock:
+    if globals_instance.Jitter == "YES" and key == keyboard.Key.caps_lock:
         caps_lock = True
         globals_instance.douqiang = not globals_instance.douqiang
         if globals_instance.douqiang:
@@ -118,7 +119,7 @@ def on_press(key, globals_instance):
             winsound.Beep(800, 100)
             winsound.Beep(600, 100)
     # if key == keyboard.Key.f9:
-    if key == keyboard.Key.scroll_lock:
+    if globals_instance.ArmorChange == "YES" and key == keyboard.Key.scroll_lock:
         huanjia_status = not huanjia_status
         if huanjia_status:
             winsound.Beep(800, 200)
@@ -136,8 +137,9 @@ def on_press(key, globals_instance):
         and not mouse_x1
     ):  # 按住ctrl
         if not e_status:  # 按住e时只触发一次
-            globals_instance.fast_rope = True
-        e_status = True
+            if globals_instance.QuickRope == "YES":
+                globals_instance.fast_rope = True
+            e_status = True
         precise_sleep(0.011)
         globals_instance.fast_rope = False
 
@@ -177,16 +179,19 @@ def on_release(key, globals_instance):
         or key == keyboard.KeyCode.from_char("E")  # 按住lshift
         or key == keyboard.KeyCode.from_char("\x05")  # 按住lctrl
     ):
-        e_status = False
-        globals_instance.fast_rope = False
+        if globals_instance.QuickRope == "YES":
+            e_status = False
 
-        if (
-            huanjia_status
-            and is_mouse_at_screen_center(10)
-            and not globals_instance.status
-        ):
-            precise_sleep(0.01)
-            huanjia(globals_instance)
+        if globals_instance.ArmorChange == "YES":
+            globals_instance.fast_rope = False
+
+            if (
+                huanjia_status
+                and is_mouse_at_screen_center(10)
+                and not globals_instance.status
+            ):
+                precise_sleep(0.01)
+                huanjia(globals_instance)
 
 
 def start_keyboard(globals_instance):

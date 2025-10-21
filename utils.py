@@ -36,7 +36,7 @@ def printLogo(device):
 ██║  ██║██║     ███████╗██╔╝ ██╗
 ╚═╝  ╚═╝╚═╝     ╚══════╝╚═╝  ╚═╝
                                                  
-          RP2040_HOST
+        RP2040/RP2350 HOST
 
     """
     elif device == "ARDUINO":

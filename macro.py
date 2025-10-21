@@ -70,9 +70,9 @@ def Scope():
 
 def ReloadSpeedUp():
     device.keyboard.click(device.keyboard.F1)
-    random_delay_ms(880, 900)
-    device.mouse.move(-10, 10)
-    random_delay_ms(80, 100)
+    random_delay_ms(100, 200)
+    device.mouse.move(-100, 0)
+    random_delay_ms(10, 20)
     device.mouse.click()
 
 
@@ -88,7 +88,7 @@ def worker_macro(globals_instance: Globals):
                 random_delay_ms(1, 4)
                 device.mouse.move(num, -num)
                 random_delay_ms(1, 4)
-                if time.time() - last_time < 1:
+                if time.time() - last_time < 0.9:
                     yaqiang()
                     random_delay_ms(1, 4)
             elif globals_instance.mouse_L and not globals_instance.mouse_R:

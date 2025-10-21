@@ -3,3 +3,16 @@ resolution: 1
 
 # 驱动来源 "RP2040_HOST"
 deviceType: "RP2040_HOST"
+
+# 启用或禁用某些功能 YES=启用, NO=禁用
+AerialSteering: "YES" #空中转向
+
+Jitter: "YES" #抖动以抵消后坐力
+
+ArmorChange: "YES" #一键更换护甲
+
+QuickPickup: "YES" #快速拾取
+
+SuperGlide: "YES" #滚轮向上 SG
+
+QuickRope: "YES" #快速上绳索
