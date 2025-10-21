@@ -107,7 +107,9 @@ class HIDDevice:
         """
         vid, pid = vid_pid or _DEFAULT_VID_PID
         if not _dll.HID_Open(vid, pid):
-            raise RuntimeError(f"无法打开HID设备 (VID: 0x{vid:04X}, PID: 0x{pid:04X})")
+            raise RuntimeError(
+                f"Unable to open HID device (VID: 0x{vid:04X}, PID: 0x{pid:04X})"
+            )
 
     @staticmethod
     def close() -> None:
