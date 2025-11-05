@@ -2,7 +2,12 @@ import time
 import random
 
 from globals import Globals
-from utils import random_delay_ms, truncated_normal_random, precise_sleep
+from utils import (
+    random_delay_ms,
+    truncated_normal_random,
+    precise_sleep,
+    template_exists,
+)
 
 
 device = None
@@ -113,7 +118,20 @@ def worker_macro(globals_instance: Globals):
 
             if globals_instance.fast_rope:
                 jump()
-
+            if globals_instance.AutoSG == "YES":
+                a = template_exists("imgs/lctrl.png", 0.98, region=(914, 546, 966, 572))
+                # print(a)
+                if a:
+                    precise_sleep(0.019)
+                    if globals_instance.space_pressed:
+                        device.keyboard.release(device.keyboard.SPACE)
+                        device.keyboard.click(device.keyboard.LCTRL)
+                    elif globals_instance.shift_pressed:
+                        device.keyboard.release(device.keyboard.LSHIFT)
+                        device.keyboard.press(device.keyboard.SPACE)
+                        precise_sleep(0.002)
+                        device.keyboard.click(device.keyboard.C)
+                        device.keyboard.release(device.keyboard.SPACE)
             else:
                 precise_sleep(0.001)
         else:

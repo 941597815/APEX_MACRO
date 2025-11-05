@@ -7,6 +7,9 @@ import ctypes
 import tkinter as tk
 from tkinter import messagebox
 import hid
+import cv2
+import numpy as np
+import mss
 
 
 def printLogo(device):
@@ -185,14 +188,40 @@ def hid_connected(vid: int, pid: int) -> bool:
     )
 
 
+def template_exists(template_path, threshold=0.8, region=None):
+    """True-存在，False-不存在"""
+    with mss.mss() as sct:
+        monitor = region if region else sct.monitors[0]
+        hay = cv2.cvtColor(np.array(sct.grab(monitor)), cv2.COLOR_BGRA2BGR)
+    tpl = cv2.imread(template_path, cv2.IMREAD_COLOR)
+    if tpl is None:
+        raise FileNotFoundError(template_path)
+    res = cv2.matchTemplate(hay, tpl, cv2.TM_CCOEFF_NORMED)
+    return res.max() >= threshold
+
+
 if __name__ == "__main__":
     # random_delay_ms(100, 800)
     # disable_keys([0x14, 0x91])
-    time.sleep(3)
-    print(get_mouse_shape())
-    # showMessage("123123123123123123")
+    # time.sleep(3)
+    # print(get_mouse_shape())
+    # # showMessage("123123123123123123")
 
-    if hid_connected(0x046D, 0xC08F):
-        print("已连接")
-    else:
-        print("未连接")
+    # if hid_connected(0x046D, 0xC08F):
+    #     print("已连接")
+    # else:
+    #     print("未连接")
+    import HIDDevice as Device
+    from globals import globals_instance
+
+    HIDDevice = Device.init(globals_instance.deviceType)
+    while 1:
+        a = template_exists("imgs/lctrl.png", 0.98, region=(914, 546, 966, 572))
+        # print(a)
+        if a:
+            # HIDDevice.keyboard.click(HIDDevice.keyboard.LCTRL)
+            precise_sleep(0.015)
+            HIDDevice.keyboard.press(HIDDevice.keyboard.SPACE)
+            precise_sleep(0.003)
+            HIDDevice.keyboard.click(HIDDevice.keyboard.C)
+            HIDDevice.keyboard.release(HIDDevice.keyboard.SPACE)

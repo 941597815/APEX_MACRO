@@ -16,3 +16,5 @@ QuickPickup: "YES" #快速拾取
 SuperGlide: "YES" #滚轮向上 SG
 
 QuickRope: "YES" #快速上绳索
+
+AutoSG: "YES" #只适配了1920x1080,其他分辨率自己修改图片模板和截图位置.需要设置攀爬加速激活->LCRTRL,攀爬加速UI->完整.按住空格时自动触发攀爬加速(成功率>99%),按住lshift时自动触发SG(效果不太好,而且会与攀爬加速冲突).

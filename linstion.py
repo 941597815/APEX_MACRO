@@ -7,7 +7,6 @@ from utils import is_mouse_at_screen_center, precise_sleep
 
 alt_pressed = False
 ctrl_pressed = False
-shift_pressed = False
 caps_lock = False
 timer = None
 timer_E = None
@@ -95,7 +94,7 @@ def start_mouse_listener(globals_instance):
 
 
 def on_press(key, globals_instance):
-    global alt_pressed, ctrl_pressed, shift_pressed, caps_lock, timer, network_restrictions, old_time, keyboard_ws, huanjia_status, timer_E, w_status, e_status
+    global alt_pressed, ctrl_pressed, caps_lock, timer, network_restrictions, old_time, keyboard_ws, huanjia_status, timer_E, w_status, e_status
 
     # 检查按下的键是否是 Home 键
     if key == keyboard.Key.home:
@@ -109,7 +108,9 @@ def on_press(key, globals_instance):
     if key == keyboard.Key.ctrl_l:
         ctrl_pressed = True
     if key == keyboard.Key.shift_l:
-        shift_pressed = True
+        globals_instance.shift_pressed = True
+    if key == keyboard.Key.space:
+        globals_instance.space_pressed = True
     if globals_instance.Jitter == "YES" and key == keyboard.Key.caps_lock:
         caps_lock = True
         globals_instance.douqiang = not globals_instance.douqiang
@@ -133,7 +134,7 @@ def on_press(key, globals_instance):
             or key == keyboard.KeyCode.from_char("\x05")
         )
         and globals_instance.status
-        and shift_pressed
+        and globals_instance.shift_pressed
         and not mouse_x1
     ):  # 按住ctrl
         if not e_status:  # 按住e时只触发一次
@@ -152,7 +153,7 @@ def on_press(key, globals_instance):
 
 
 def on_release(key, globals_instance):
-    global alt_pressed, ctrl_pressed, shift_pressed, caps_lock, huanjia_status, w_status, e_status
+    global alt_pressed, ctrl_pressed, caps_lock, huanjia_status, w_status, e_status
 
     # print(str(key) == str(keyboard.KeyCode(vk=49)))
     # print(str(key))
@@ -162,9 +163,11 @@ def on_release(key, globals_instance):
     if key == keyboard.Key.ctrl_l:
         ctrl_pressed = False
     if key == keyboard.Key.shift_l:
-        shift_pressed = False
+        globals_instance.shift_pressed = False
     if key == keyboard.Key.caps_lock:
         caps_lock = False
+    if key == keyboard.Key.space:
+        globals_instance.space_pressed = False
     # if key == keyboard.KeyCode.from_char("r") or key == keyboard.KeyCode.from_char("R"):
     #     ReloadSpeedUp()
     if (
