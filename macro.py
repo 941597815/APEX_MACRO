@@ -118,8 +118,12 @@ def worker_macro(globals_instance: Globals):
 
             if globals_instance.fast_rope:
                 jump()
-            if globals_instance.AutoSG == "YES":
-                a = template_exists("imgs/lctrl.png", 0.98, region=(914, 546, 966, 572))
+            if globals_instance.AutoSG == "YES" and (
+                globals_instance.space_pressed or globals_instance.shift_pressed
+            ):
+                a = template_exists(
+                    "imgs/lctrl-1920x1080.png", 0.98, region=(916, 549, 963, 569)
+                )
                 # print(a)
                 if a:
                     precise_sleep(0.019)

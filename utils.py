@@ -216,7 +216,9 @@ if __name__ == "__main__":
 
     HIDDevice = Device.init(globals_instance.deviceType)
     while 1:
-        a = template_exists("imgs/lctrl.png", 0.98, region=(914, 546, 966, 572))
+        a = template_exists(
+            "imgs/lctrl-1920x1080.png", 0.98, region=(916, 549, 963, 569)
+        )
         # print(a)
         if a:
             # HIDDevice.keyboard.click(HIDDevice.keyboard.LCTRL)
