@@ -7,11 +7,11 @@ setlocal enabledelayedexpansion
 net session >nul 2>&1
 
 if %errorlevel% == 0 (
-    python ./main.py
+    python main.py
     @REM echo as admin
     @REM pause
 ) else (
-    echo not as admin
+    echo Please run as administrator
     pause
     exit /b
 )
