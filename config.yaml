@@ -8,6 +8,8 @@ deviceType: "RP2040_HOST"
 AerialSteering: "YES" #空中转向
 
 Jitter: "YES" #抖动以抵消后坐力
+JitterDown: "YES" #抖动的同时向下移动以更多的抵消后坐力
+JitterDownTime: 0.9 #抖动的同时向下移动的时间
 
 ArmorChange: "YES" #一键更换护甲
 

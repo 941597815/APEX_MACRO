@@ -93,7 +93,10 @@ def worker_macro(globals_instance: Globals):
                 random_delay_ms(1, 4)
                 device.mouse.move(num, -num)
                 random_delay_ms(1, 4)
-                if time.time() - last_time < 0.9:
+                if (
+                    globals_instance.JitterDown == "YES"
+                    and time.time() - last_time < globals_instance.JitterDownTime
+                ):
                     yaqiang()
                     random_delay_ms(1, 4)
             elif globals_instance.mouse_L and not globals_instance.mouse_R:

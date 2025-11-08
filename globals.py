@@ -31,6 +31,8 @@ deviceType: "RP2040_HOST"
 AerialSteering: "YES" #空中转向
 
 Jitter: "YES" #抖动以抵消后坐力
+JitterDown: "YES" #抖动的同时向下移动以更多的抵消后坐力
+JitterDownTime: 0.9 #抖动的同时向下移动的时间
 
 ArmorChange: "YES" #一键更换护甲
 
@@ -43,7 +45,7 @@ QuickRope: "YES" #快速上绳索
 AutoSG: "YES" #只适配了1920x1080,其他分辨率自己修改图片模板和截图位置.需要设置攀爬加速激活->LCRTRL,攀爬加速UI->完整.按住空格时自动触发攀爬加速(成功率>99%),按住lshift时自动触发SG(效果不太好,而且会与攀爬加速冲突).
 """
         CONFIG_PATH.write_text(default_config_yaml, encoding="utf-8")
-        print(f"已创建默认配置文件: {CONFIG_PATH}")
+        print(f"A default configuration file has been created: {CONFIG_PATH}")
 
 
 def save_config():
@@ -82,6 +84,8 @@ class Globals:
         self.deviceType = "RP2040_HOST"
         self.AerialSteering = "YES"
         self.Jitter = "YES"
+        self.JitterDown = "YES"
+        self.JitterDownTime = 0.9
         self.QuickPickup = "YES"
         self.SuperGlide = "YES"
         self.QuickRope = "YES"
