@@ -4,3 +4,4 @@ pywin32==309
 pyinstaller==6.15.0
 hidapi
 pyyaml
+mss==10.0.0

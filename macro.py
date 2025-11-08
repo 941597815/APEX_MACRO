@@ -129,11 +129,12 @@ def worker_macro(globals_instance: Globals):
                 )
                 # print(a)
                 if a:
-                    precise_sleep(0.019)
                     if globals_instance.space_pressed:
+                        precise_sleep(0.019)
                         device.keyboard.release(device.keyboard.SPACE)
                         device.keyboard.click(device.keyboard.LCTRL)
                     elif globals_instance.shift_pressed:
+                        precise_sleep(0.023)
                         device.keyboard.release(device.keyboard.LSHIFT)
                         device.keyboard.press(device.keyboard.SPACE)
                         precise_sleep(0.003)
