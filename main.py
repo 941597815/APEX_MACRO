@@ -23,7 +23,7 @@ if __name__ == "__main__":
             globals_instance.device = HIDDevice
     except Exception as e:
         # print("出错了：", e)
-        showMessage(f"{globals_instance.deviceType}_KM Device not connected")
+        showMessage(f"KM Device not connected")
         os._exit(0)
 
     # 启动监听器线程
@@ -44,7 +44,7 @@ if __name__ == "__main__":
     printLogo(globals_instance.deviceType)
 
     last_time = time.time()
-    # 启动主进程
+    # 启动主线程
     while True:
         # 更新游戏状态
         globals_instance.status = get_mouse_shape() == 0

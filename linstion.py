@@ -2,20 +2,13 @@ import os
 import winsound
 import time
 from pynput import mouse, keyboard
-from macro import huanjia, SG, ReloadSpeedUp, jump
+from macro import huanjia, SG, ReloadSpeedUp
 from utils import is_mouse_at_screen_center, precise_sleep
 
 alt_pressed = False
 ctrl_pressed = False
 caps_lock = False
-timer = None
-timer_E = None
-network_restrictions = False
 old_time = time.time()
-# mouse_R = False
-# mouse_L = False
-keyboard_ws = False
-# douqiang = False
 huanjia_status = False
 e_status = False
 w_status = False
@@ -94,7 +87,7 @@ def start_mouse_listener(globals_instance):
 
 
 def on_press(key, globals_instance):
-    global alt_pressed, ctrl_pressed, caps_lock, timer, network_restrictions, old_time, keyboard_ws, huanjia_status, timer_E, w_status, e_status
+    global alt_pressed, ctrl_pressed, caps_lock, old_time, huanjia_status, w_status, e_status
 
     # 检查按下的键是否是 Home 键
     if key == keyboard.Key.home:
