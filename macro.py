@@ -21,29 +21,28 @@ def huanjia(globals_instance):
     else:
         n = 1
     device.mouse.move(int(-580 * n), int(14 * n))
-    random_delay_ms(13, 16)
+    random_delay_ms(6, 10)
     device.mouse.click()
-    random_delay_ms(13, 16)
+    random_delay_ms(6, 10)
     device.mouse.move(0, int((72 - 14) * n))
-    random_delay_ms(13, 16)
+    random_delay_ms(6, 10)
     device.mouse.click()
-    random_delay_ms(13, 16)
+    random_delay_ms(6, 10)
     device.mouse.move(0, int((180 - 72) * n))
-    random_delay_ms(13, 16)
+    random_delay_ms(6, 10)
     device.mouse.click()
-    random_delay_ms(13, 16)
+    random_delay_ms(6, 10)
     device.mouse.move(0, int((282 - 180) * n))
-    random_delay_ms(13, 16)
+    random_delay_ms(6, 10)
     device.mouse.click()
-    random_delay_ms(13, 16)
+    random_delay_ms(6, 10)
     device.keyboard.click(device.keyboard.TAB)
 
 
 def SG():
     device.keyboard.press(device.keyboard.SPACE)
-    precise_sleep(0.003)
+    precise_sleep(0.004)
     device.keyboard.click(device.keyboard.C)
-    # precise_sleep(0.007)
     device.keyboard.release(device.keyboard.SPACE)
 
 
@@ -113,11 +112,11 @@ def worker_macro(globals_instance: Globals):
             if globals_instance.zhuanxiang:
                 device.keyboard.click(device.keyboard.SPACE)
                 random_delay_ms(0, 5)
-                device.keyboard.press(device.keyboard.LSHIFT)
-                for i in range(truncated_normal_random(3, 7)):
+                # device.keyboard.press(device.keyboard.LSHIFT)
+                for i in range(truncated_normal_random(6, 9)):
                     device.keyboard.click(device.keyboard.W)
                     random_delay_ms(0, 5)
-                device.keyboard.release(device.keyboard.LSHIFT)
+                # device.keyboard.release(device.keyboard.LSHIFT)
 
             if globals_instance.fast_rope:
                 jump()
@@ -134,13 +133,13 @@ def worker_macro(globals_instance: Globals):
                         device.keyboard.release(device.keyboard.SPACE)
                         device.keyboard.click(device.keyboard.LCTRL)
                     elif globals_instance.shift_pressed:
-                        precise_sleep(0.023)
+                        precise_sleep(0.020)
                         device.keyboard.release(device.keyboard.LSHIFT)
                         device.keyboard.press(device.keyboard.SPACE)
-                        precise_sleep(0.003)
+                        precise_sleep(0.004)
                         device.keyboard.click(device.keyboard.C)
                         device.keyboard.release(device.keyboard.SPACE)
             else:
                 precise_sleep(0.001)
         else:
-            precise_sleep(0.001)
+            time.sleep(0.008)

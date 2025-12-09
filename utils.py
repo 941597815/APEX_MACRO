@@ -128,21 +128,15 @@ def disable_keys(keys):
             ctypes.windll.user32.keybd_event(vk, 0, 2, 0)  # KEYUP
 
 
-def precise_sleep(duration, precision: float = 0.0001, get_now=time.perf_counter):
+def precise_sleep(duration: float):
     """
-    自适应补偿的精确 sleep
-
-    :param duration:  需要休眠的总时长（秒）
-    :param precision: 最大允许忙等时长（秒），也是误差上限
-    :param get_now:   时间源，默认 time.perf_counter
+    高精度延时函数，只适用毫秒级精细控制
+    每 50 µs 让一次片，防止单核跑满
     """
-    end = get_now() + duration
-    while True:
-        remaining = end - get_now()
-        if remaining <= 0:
-            break
-        if remaining > precision:  # 真正可控的 sleep 时长
-            time.sleep(remaining - precision)
+    end = time.perf_counter() + duration
+    while time.perf_counter() < end:
+        # 50 µs 粒度让片，既不会被挂起，也不会烧核
+        ctypes.windll.kernel32.SwitchToThread()
 
 
 def showMessage(msg: str, title="提示"):

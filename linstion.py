@@ -9,7 +9,6 @@ alt_pressed = False
 ctrl_pressed = False
 caps_lock = False
 old_time = time.time()
-huanjia_status = False
 e_status = False
 w_status = False
 mouse_x1 = False
@@ -87,7 +86,7 @@ def start_mouse_listener(globals_instance):
 
 
 def on_press(key, globals_instance):
-    global alt_pressed, ctrl_pressed, caps_lock, old_time, huanjia_status, w_status, e_status
+    global alt_pressed, ctrl_pressed, caps_lock, old_time, w_status, e_status
 
     # 检查按下的键是否是 Home 键
     if key == keyboard.Key.home:
@@ -108,14 +107,6 @@ def on_press(key, globals_instance):
         caps_lock = True
         globals_instance.douqiang = not globals_instance.douqiang
         if globals_instance.douqiang:
-            winsound.Beep(800, 200)
-        else:
-            winsound.Beep(800, 100)
-            winsound.Beep(600, 100)
-    # if key == keyboard.Key.f9:
-    if globals_instance.ArmorChange == "YES" and key == keyboard.Key.scroll_lock:
-        huanjia_status = not huanjia_status
-        if huanjia_status:
             winsound.Beep(800, 200)
         else:
             winsound.Beep(800, 100)
@@ -146,7 +137,7 @@ def on_press(key, globals_instance):
 
 
 def on_release(key, globals_instance):
-    global alt_pressed, ctrl_pressed, caps_lock, huanjia_status, w_status, e_status
+    global alt_pressed, ctrl_pressed, caps_lock, w_status, e_status
 
     # print(str(key) == str(keyboard.KeyCode(vk=49)))
     # print(str(key))
@@ -181,11 +172,7 @@ def on_release(key, globals_instance):
         if globals_instance.ArmorChange == "YES":
             globals_instance.fast_rope = False
 
-            if (
-                huanjia_status
-                and is_mouse_at_screen_center(10)
-                and not globals_instance.status
-            ):
+            if is_mouse_at_screen_center(10) and not globals_instance.status:
                 precise_sleep(0.01)
                 huanjia(globals_instance)
 

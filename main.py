@@ -8,7 +8,6 @@ from utils import (
     get_mouse_shape,
     disable_keys,
     printLogo,
-    precise_sleep,
     showMessage,
     hid_connected,
 )
@@ -62,4 +61,4 @@ if __name__ == "__main__":
                 os._exit(0)  # 结束程序
 
         # 循环间隔
-        precise_sleep(0.008)
+        time.sleep(0.008)
