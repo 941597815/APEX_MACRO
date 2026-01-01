@@ -47,9 +47,9 @@ def SG():
 
 
 def jump():
-    for i in range(truncated_normal_random(3, 6)):
+    for i in range(truncated_normal_random(6, 12)):
         device.keyboard.click(device.keyboard.SPACE)
-        random_delay_ms(3, 6)
+        random_delay_ms(6, 12)
 
 
 def yaqiang():
@@ -123,9 +123,16 @@ def worker_macro(globals_instance: Globals):
             if globals_instance.AutoSG == "YES" and (
                 globals_instance.space_pressed or globals_instance.shift_pressed
             ):
-                a = template_exists(
-                    "imgs/lctrl-1920x1080.png", 0.98, region=(916, 549, 963, 569)
-                )
+                if globals_instance.resolution == 1:
+                    a = template_exists(
+                        "imgs/lctrl-1920x1080.png", 0.98, region=(916, 549, 963, 569)
+                    )
+                elif globals_instance.resolution == 2:
+                    a = template_exists(
+                        "imgs/lctrl-2560x1440.png", 0.98, region=(1223, 733, 1284, 760)
+                    )
+                else:
+                    a = False
                 # print(a)
                 if a:
                     if globals_instance.space_pressed:

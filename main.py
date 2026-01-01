@@ -21,7 +21,7 @@ if __name__ == "__main__":
         if HIDDevice is not None:
             globals_instance.device = HIDDevice
     except Exception as e:
-        # print("出错了：", e)
+        print("ERROR: ", e)
         showMessage(f"KM Device not connected")
         os._exit(0)
 
