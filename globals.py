@@ -28,7 +28,7 @@ resolution: 1
 deviceType: "RP2040_HOST"
 
 # 启用或禁用某些功能 YES=启用, NO=禁用
-AerialSteering: "YES" #空中转向
+AerialSteering: "YES" #空中转向.需要同时按住鼠标x2和键盘w键
 
 Jitter: "YES" #抖动以抵消后坐力
 JitterDown: "YES" #抖动的同时向下移动以更多的抵消后坐力
@@ -75,9 +75,15 @@ class Globals:
         self.zhuanxiang = False
         self.douqiang = False
         self.e = False
+        self.w = False
+        self.a = False
+        self.s = False
+        self.d = False
         self.fast_rope = False
         self.mouse_L = False
         self.mouse_R = False
+        self.mouse_x1 = False
+        self.mouse_x2 = False
         self.space_pressed = False
         self.shift_pressed = False
         self.device = None

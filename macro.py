@@ -111,15 +111,14 @@ def worker_macro(globals_instance: Globals):
 
             if globals_instance.zhuanxiang:
                 device.keyboard.click(device.keyboard.SPACE)
-                random_delay_ms(0, 5)
-                # device.keyboard.press(device.keyboard.LSHIFT)
-                for i in range(truncated_normal_random(6, 9)):
-                    device.keyboard.click(device.keyboard.W)
-                    random_delay_ms(0, 5)
-                # device.keyboard.release(device.keyboard.LSHIFT)
+                random_delay_ms(5, 10)
+                # for i in range(truncated_normal_random(6, 9)):
+                #     device.keyboard.click(device.keyboard.W)
+                #     random_delay_ms(0, 3)
 
             if globals_instance.fast_rope:
                 jump()
+
             if globals_instance.AutoSG == "YES" and (
                 globals_instance.space_pressed or globals_instance.shift_pressed
             ):
@@ -136,16 +135,31 @@ def worker_macro(globals_instance: Globals):
                 # print(a)
                 if a:
                     if globals_instance.space_pressed:
-                        precise_sleep(0.019)
+                        precise_sleep(0.015)
                         device.keyboard.release(device.keyboard.SPACE)
                         device.keyboard.click(device.keyboard.LCTRL)
                     elif globals_instance.shift_pressed:
-                        precise_sleep(0.020)
+                        precise_sleep(0.025)
                         device.keyboard.release(device.keyboard.LSHIFT)
                         device.keyboard.press(device.keyboard.SPACE)
                         precise_sleep(0.004)
                         device.keyboard.click(device.keyboard.C)
                         device.keyboard.release(device.keyboard.SPACE)
+
+            if globals_instance.mouse_x2:
+                if globals_instance.w:
+                    device.keyboard.click(device.keyboard.W)
+                    random_delay_ms(1, 5)
+                # if globals_instance.a:
+                #     device.keyboard.click(device.keyboard.A)
+                #     random_delay_ms(1, 5)
+                # if globals_instance.s:
+                #     device.keyboard.click(device.keyboard.S)
+                #     random_delay_ms(1, 5)
+                # if globals_instance.d:
+                #     device.keyboard.click(device.keyboard.D)
+                #     random_delay_ms(1, 5)
+
             else:
                 precise_sleep(0.001)
         else:

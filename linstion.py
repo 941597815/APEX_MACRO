@@ -16,14 +16,11 @@ ctrl_pressed = False
 caps_lock = False
 old_time = time.time()
 e_status = False
-w_status = False
-mouse_x1 = False
 
 
 # 鼠标点击回调函数
 def on_click(x, y, button, pressed, globals_instance):
-    global mouse_x1
-    print(f"x:{x},y:{y},button:{button},pressed:{pressed}")
+    # print(f"x:{x},y:{y},button:{button},pressed:{pressed}")
 
     if globals_instance.Jitter == "YES":
         if button == "left":
@@ -49,22 +46,35 @@ def on_click(x, y, button, pressed, globals_instance):
 
     if globals_instance.QuickPickup == "YES" and button == "x1":
         if pressed:
-            mouse_x1 = True
+            globals_instance.mouse_x1 = True
             globals_instance.e = True
         else:
-            mouse_x1 = False
+            globals_instance.mouse_x1 = False
             globals_instance.e = False
     if globals_instance.AerialSteering == "YES" and button == "x2":
         if pressed:
+            globals_instance.mouse_x2 = True
             globals_instance.zhuanxiang = True
         else:
+            globals_instance.mouse_x2 = False
             globals_instance.zhuanxiang = False
+            if globals_instance.w:
+                globals_instance.device.keyboard.press(
+                    globals_instance.device.keyboard.W
+                )
+                globals_instance.device.keyboard.click(
+                    globals_instance.device.keyboard.LSHIFT
+                )
+            else:
+                globals_instance.device.keyboard.release(
+                    globals_instance.device.keyboard.W
+                )
 
 
 def on_scroll(x, y, delta, globals_instance):
     global old_time
 
-    print(f"x:{x},y:{y},delta:{delta}")
+    # print(f"x:{x},y:{y},delta:{delta}")
 
     # 不能与其他宏一起调用，否则卡死
     if (
@@ -83,9 +93,9 @@ def on_scroll(x, y, delta, globals_instance):
 
 
 def on_press(key, globals_instance):
-    global alt_pressed, ctrl_pressed, caps_lock, old_time, w_status, e_status
+    global alt_pressed, ctrl_pressed, caps_lock, old_time, e_status
 
-    print(f"[kb_press] {key}")
+    # print(f"[kb_press] {key}")
 
     # 检查按下的键是否是 Home 键
     if key == "home":
@@ -114,7 +124,7 @@ def on_press(key, globals_instance):
         (key == "e")
         and globals_instance.status
         and globals_instance.shift_pressed
-        and not mouse_x1
+        and not globals_instance.mouse_x1
     ):  # 按住ctrl
         if not e_status:  # 按住e时只触发一次
             if globals_instance.QuickRope == "YES":
@@ -123,14 +133,23 @@ def on_press(key, globals_instance):
         precise_sleep(0.011)
         globals_instance.fast_rope = False
 
-    if key == "w":
-        w_status = True
+    if globals_instance.AerialSteering == "YES" and key == "w":
+        globals_instance.w = True
+
+    if key == "a":
+        globals_instance.a = True
+
+    if key == "s":
+        globals_instance.s = True
+
+    if key == "d":
+        globals_instance.d = True
 
 
 def on_release(key, globals_instance):
-    global alt_pressed, ctrl_pressed, caps_lock, w_status, e_status
+    global alt_pressed, ctrl_pressed, caps_lock, e_status
 
-    print(f"[kb_release] {key}")
+    # print(f"[kb_release] {key}")
 
     if key == "lalt":
         alt_pressed = False
@@ -145,8 +164,6 @@ def on_release(key, globals_instance):
         globals_instance.space_pressed = False
     # if key == "r":
     #     ReloadSpeedUp()
-    if key == "w":
-        w_status = False
 
     if key == "e":
         if globals_instance.QuickRope == "YES":
@@ -158,6 +175,22 @@ def on_release(key, globals_instance):
             if is_mouse_at_screen_center(10) and not globals_instance.status:
                 precise_sleep(0.01)
                 huanjia(globals_instance)
+
+    if key == "w":
+        globals_instance.w = False
+        globals_instance.device.keyboard.release(globals_instance.device.keyboard.W)
+
+    if key == "a":
+        globals_instance.a = False
+        globals_instance.device.keyboard.release(globals_instance.device.keyboard.A)
+
+    if key == "s":
+        globals_instance.s = False
+        globals_instance.device.keyboard.release(globals_instance.device.keyboard.S)
+
+    if key == "d":
+        globals_instance.d = False
+        globals_instance.device.keyboard.release(globals_instance.device.keyboard.D)
 
 
 def start_linstions(globals_instance):
