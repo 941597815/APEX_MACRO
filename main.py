@@ -2,7 +2,7 @@ import threading
 import os
 import time
 from globals import globals_instance
-from linstion import start_mouse_listener, start_keyboard
+from linstion import start_linstions
 from macro import worker_macro
 from utils import (
     get_mouse_shape,
@@ -25,13 +25,10 @@ if __name__ == "__main__":
         showMessage(f"KM Device not connected")
         os._exit(0)
 
+    # 启动键鼠监听器线程
+    start_linstions(globals_instance)
+
     # 启动监听器线程
-    listener_mouse_thread = threading.Thread(
-        target=start_mouse_listener, args=(globals_instance,), daemon=True
-    ).start()
-    listener_keyboard_thread = threading.Thread(
-        target=start_keyboard, args=(globals_instance,), daemon=True
-    ).start()
     listener_macro_thread = threading.Thread(
         target=worker_macro, args=(globals_instance,), daemon=True
     ).start()

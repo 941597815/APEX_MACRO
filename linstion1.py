@@ -1,15 +1,9 @@
 import os
 import winsound
 import time
-from raw_input import keyboard, mouse
+from pynput import mouse, keyboard
 from macro import huanjia, SG, ReloadSpeedUp
 from utils import is_mouse_at_screen_center, precise_sleep
-
-exclude_kb = [
-    {"vid": 0x046D, "pid": 0xC08B},  # 排除这个键盘
-    # {"vid": 0x1532},  # 排除该厂商所有键盘设备
-]
-# exclude_mouse = [{"vid": 0x046D, "pid": 0xC08B}]
 
 alt_pressed = False
 ctrl_pressed = False
@@ -23,10 +17,8 @@ mouse_x1 = False
 # 鼠标点击回调函数
 def on_click(x, y, button, pressed, globals_instance):
     global mouse_x1
-    print(f"x:{x},y:{y},button:{button},pressed:{pressed}")
-
     if globals_instance.Jitter == "YES":
-        if button == "left":
+        if button == mouse.Button.left:  # 检测鼠标左键
             if pressed:
                 globals_instance.mouse_L = True
                 if globals_instance.mouse_R and globals_instance.douqiang:
@@ -37,7 +29,7 @@ def on_click(x, y, button, pressed, globals_instance):
                 globals_instance.mouse_L = False
 
                 # print("结束")
-        if button == "right":
+        if button == mouse.Button.right:
             if pressed:
                 globals_instance.mouse_R = True
                 if globals_instance.mouse_L and globals_instance.douqiang:
@@ -47,29 +39,28 @@ def on_click(x, y, button, pressed, globals_instance):
                 globals_instance.mouse_R = False
                 globals_instance.running = False
 
-    if globals_instance.QuickPickup == "YES" and button == "x1":
+    if globals_instance.QuickPickup == "YES" and button == mouse.Button.x1:
         if pressed:
             mouse_x1 = True
             globals_instance.e = True
         else:
             mouse_x1 = False
             globals_instance.e = False
-    if globals_instance.AerialSteering == "YES" and button == "x2":
+    if globals_instance.AerialSteering == "YES" and button == mouse.Button.x2:
         if pressed:
             globals_instance.zhuanxiang = True
         else:
             globals_instance.zhuanxiang = False
 
 
-def on_scroll(x, y, delta, globals_instance):
+def on_scroll(x, y, dx, dy, globals_instance):
     global old_time
 
-    print(f"x:{x},y:{y},delta:{delta}")
-
+    # print(dy)
     # 不能与其他宏一起调用，否则卡死
     if (
         globals_instance.SuperGlide == "YES"
-        and delta > 0
+        and dy > 0
         and globals_instance.status
         and not globals_instance.zhuanxiang
         and not globals_instance.e
@@ -82,27 +73,37 @@ def on_scroll(x, y, delta, globals_instance):
         return
 
 
+# 鼠标监听器线程
+def start_mouse_listener(globals_instance):
+    listener = mouse.Listener(
+        on_click=lambda x, y, button, pressed: on_click(
+            x, y, button, pressed, globals_instance
+        ),
+        on_scroll=lambda x, y, dx, dy: on_scroll(x, y, dx, dy, globals_instance),
+    )
+    listener.start()
+    listener.join()
+
+
 def on_press(key, globals_instance):
     global alt_pressed, ctrl_pressed, caps_lock, old_time, w_status, e_status
 
-    print(f"[kb_press] {key}")
-
     # 检查按下的键是否是 Home 键
-    if key == "home":
+    if key == keyboard.Key.home:
         globals_instance.device.close()
         winsound.Beep(800, 100)
         winsound.Beep(600, 100)
         winsound.Beep(400, 100)
         os._exit(0)  # 结束程序
-    if key == "lalt":
+    if key == keyboard.Key.alt_l:
         alt_pressed = True
-    if key == "lctrl":
+    if key == keyboard.Key.ctrl_l:
         ctrl_pressed = True
-    if key == "lshift":
+    if key == keyboard.Key.shift_l:
         globals_instance.shift_pressed = True
-    if key == "space":
+    if key == keyboard.Key.space:
         globals_instance.space_pressed = True
-    if globals_instance.Jitter == "YES" and key == "caps_lock":
+    if globals_instance.Jitter == "YES" and key == keyboard.Key.caps_lock:
         caps_lock = True
         globals_instance.douqiang = not globals_instance.douqiang
         if globals_instance.douqiang:
@@ -111,7 +112,11 @@ def on_press(key, globals_instance):
             winsound.Beep(800, 100)
             winsound.Beep(600, 100)
     if (
-        (key == "e")
+        (
+            key == keyboard.KeyCode.from_char("e")
+            or key == keyboard.KeyCode.from_char("E")  # or按住shift
+            or key == keyboard.KeyCode.from_char("\x05")
+        )
         and globals_instance.status
         and globals_instance.shift_pressed
         and not mouse_x1
@@ -123,32 +128,44 @@ def on_press(key, globals_instance):
         precise_sleep(0.011)
         globals_instance.fast_rope = False
 
-    if key == "w":
+    if (
+        key == keyboard.KeyCode.from_char("w")
+        or key == keyboard.KeyCode.from_char("W")
+        or key == keyboard.KeyCode.from_char("\x17")
+    ):
         w_status = True
 
 
 def on_release(key, globals_instance):
     global alt_pressed, ctrl_pressed, caps_lock, w_status, e_status
 
-    print(f"[kb_release] {key}")
-
-    if key == "lalt":
+    # print(str(key) == str(keyboard.KeyCode(vk=49)))
+    # print(str(key))
+    if key == keyboard.Key.alt_l:
         alt_pressed = False
         # print('altUp')
-    if key == "lctrl":
+    if key == keyboard.Key.ctrl_l:
         ctrl_pressed = False
-    if key == "lshift":
+    if key == keyboard.Key.shift_l:
         globals_instance.shift_pressed = False
-    if key == "caps_lock":
+    if key == keyboard.Key.caps_lock:
         caps_lock = False
-    if key == "space":
+    if key == keyboard.Key.space:
         globals_instance.space_pressed = False
-    # if key == "r":
+    # if key == keyboard.KeyCode.from_char("r") or key == keyboard.KeyCode.from_char("R"):
     #     ReloadSpeedUp()
-    if key == "w":
+    if (
+        key == keyboard.KeyCode.from_char("w")
+        or key == keyboard.KeyCode.from_char("W")
+        or key == keyboard.KeyCode.from_char("\x17")
+    ):
         w_status = False
 
-    if key == "e":
+    if (
+        key == keyboard.KeyCode.from_char("e")
+        or key == keyboard.KeyCode.from_char("E")  # 按住lshift
+        or key == keyboard.KeyCode.from_char("\x05")  # 按住lctrl
+    ):
         if globals_instance.QuickRope == "YES":
             e_status = False
 
@@ -160,20 +177,10 @@ def on_release(key, globals_instance):
                 huanjia(globals_instance)
 
 
-def start_linstions(globals_instance):
-
-    kb_listener = keyboard.Listener(
+def start_keyboard(globals_instance):
+    listener = keyboard.Listener(
         on_press=lambda key: on_press(key, globals_instance),
         on_release=lambda key: on_release(key, globals_instance),
-        exclude_devices=exclude_kb,
     )
-    mouse_listener = mouse.Listener(
-        on_click=lambda x, y, button, pressed: on_click(
-            x, y, button, pressed, globals_instance
-        ),
-        on_scroll=lambda x, y, delta: on_scroll(x, y, delta, globals_instance),
-        # exclude_devices=exclude_mouse,
-    )
-
-    kb_listener.start()
-    mouse_listener.start()
+    listener.start()
+    listener.join()
